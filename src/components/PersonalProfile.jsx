@@ -124,7 +124,6 @@ export default function PersonalProfile({ userProfile, logs, onOpenAuth }) {
               <thead className="sticky top-0 bg-slate-900 border-b border-slate-800 text-slate-400 uppercase">
                 <tr>
                   <th className="py-2 px-3">Tarih</th>
-                  <th className="py-2 px-3">Okunan Eser</th>
                   <th className="py-2 px-3 text-right">Sayfa Sayısı</th>
                 </tr>
               </thead>
@@ -134,9 +133,6 @@ export default function PersonalProfile({ userProfile, logs, onOpenAuth }) {
                     <td className="py-2.5 px-3 font-medium flex items-center gap-1.5">
                       <Calendar className="h-3 w-3 text-slate-500" />
                       {log.log_date}
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-400">
-                      {log.book_title || 'Genel / Risale-i Nur'}
                     </td>
                     <td className="py-2.5 px-3 text-right font-bold text-emerald-400">
                       {log.page_count} sayfa

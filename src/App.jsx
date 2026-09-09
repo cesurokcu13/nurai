@@ -7,7 +7,7 @@ import PersonalProfile from './components/PersonalProfile';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import { apiService, isSupabaseConfigured } from './lib/supabase';
-import { Info, Database } from 'lucide-react';
+import { Database } from 'lucide-react';
 
 export default function App() {
   const [userProfile, setUserProfile] = useState(null);
@@ -56,13 +56,12 @@ export default function App() {
   };
 
   // Save Daily Reading Log
-  const handleSaveLog = async ({ dateStr, pageCount, bookTitle }) => {
+  const handleSaveLog = async ({ dateStr, pageCount }) => {
     if (!userProfile) return;
     await apiService.saveReadingLog({
       userId: userProfile.id,
       dateStr,
       pageCount,
-      bookTitle,
       profile: userProfile
     });
     await loadData();

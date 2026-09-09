@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, Award, Flame, BookOpen, Clock, ShieldCheck } from 'lucide-react';
+import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
 export default function TablesSection({ logs }) {
@@ -45,8 +45,7 @@ export default function TablesSection({ logs }) {
             nickname,
             badgeColor,
             totalPages: 0,
-            daysActiveSet: new Set(),
-            lastBook: log.book_title
+            daysActiveSet: new Set()
           };
         }
         userMap[userId].totalPages += log.page_count;
@@ -101,7 +100,7 @@ export default function TablesSection({ logs }) {
             Okuma Tabloları & Sıralama
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Anonim kullanıcı adları ile günlük, haftalık ve aylık okuma takibi.
+            Anonim renk takma adları ile günlük, haftalık ve aylık okuma takibi.
           </p>
         </div>
 
@@ -168,7 +167,6 @@ export default function TablesSection({ logs }) {
                   <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                     <th className="pb-3 px-3">Sıra</th>
                     <th className="pb-3 px-3">Anonim Okuyucu</th>
-                    <th className="pb-3 px-3">Okunan Eser</th>
                     <th className="pb-3 px-3 text-right">Sayfa Sayısı</th>
                   </tr>
                 </thead>
@@ -188,9 +186,6 @@ export default function TablesSection({ logs }) {
                               {nickname}
                             </span>
                           </div>
-                        </td>
-                        <td className="py-3.5 px-3 text-slate-300 text-xs">
-                          {log.book_title || 'Genel / Risale-i Nur'}
                         </td>
                         <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
                           {log.page_count} sayfa

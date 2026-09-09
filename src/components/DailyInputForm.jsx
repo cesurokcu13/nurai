@@ -1,29 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BookPlus, Calendar, CheckCircle2, Lock, Sparkles, BookOpen } from 'lucide-react';
+import { BookPlus, Calendar, CheckCircle2, Lock, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
-
-const RISALE_BOOKS = [
-  'Genel / Risale-i Nur',
-  'Sözler',
-  'Mektubat',
-  'Lem\'alar',
-  'Şualar',
-  'Tarihçe-i Hayat',
-  'Asa-yı Musa',
-  'Barla Lâhikası',
-  'Kastamonu Lâhikası',
-  'Emirdağ Lâhikası',
-  'Mesnevi-i Nuriye',
-  'İşaratü\'l-İ\'caz',
-  'Sikke-i Tasdik-i Gaybî'
-];
 
 export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAuth }) {
   const todayStr = new Date().toISOString().split('T')[0];
   const [dateStr, setDateStr] = useState(todayStr);
   const [pageCount, setPageCount] = useState('');
-  const [bookTitle, setBookTitle] = useState(RISALE_BOOKS[0]);
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
@@ -35,7 +18,6 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
       );
       if (userTodayLog) {
         setPageCount(userTodayLog.page_count.toString());
-        if (userTodayLog.book_title) setBookTitle(userTodayLog.book_title);
       } else {
         setPageCount('');
       }
@@ -55,8 +37,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
       setSaving(true);
       await onSaveLog({
         dateStr,
-        pageCount: parseInt(pageCount, 10),
-        bookTitle
+        pageCount: parseInt(pageCount, 10)
       });
 
       setSuccessMsg('Okumanız başarıyla kaydedildi! Maşallah 🌟');
@@ -124,24 +105,24 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-4">
         {/* Date Selector */}
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-5">
           <label className="block text-xs font-medium text-slate-400 mb-1.5">
             Tarih
           </label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
+            <Calendar className="absolute left-3.5 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
             <input
               type="date"
               required
               value={dateStr}
               onChange={(e) => setDateStr(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 transition"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 transition"
             />
           </div>
         </div>
 
         {/* Page Count */}
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-4">
           <label className="block text-xs font-medium text-slate-400 mb-1.5">
             Okunan Sayfa Sayısı
           </label>
@@ -156,26 +137,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
               onChange={(e) => setPageCount(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-semibold placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
             />
-            <span className="absolute right-3 top-3 text-xs text-slate-500 font-medium">sayfa</span>
-          </div>
-        </div>
-
-        {/* Optional Book Title */}
-        <div className="sm:col-span-3">
-          <label className="block text-xs font-medium text-slate-400 mb-1.5">
-            Eser (Opsiyonel)
-          </label>
-          <div className="relative">
-            <BookOpen className="absolute left-3 top-3 h-4 w-4 text-slate-500 pointer-events-none" />
-            <select
-              value={bookTitle}
-              onChange={(e) => setBookTitle(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 transition appearance-none cursor-pointer"
-            >
-              {RISALE_BOOKS.map((b) => (
-                <option key={b} value={b} className="bg-slate-900 text-white">{b}</option>
-              ))}
-            </select>
+            <span className="absolute right-3.5 top-3 text-xs text-slate-500 font-medium">sayfa</span>
           </div>
         </div>
 

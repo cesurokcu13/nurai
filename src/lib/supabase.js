@@ -24,13 +24,12 @@ const INITIAL_DEMO_PROFILES = [
   { id: 'demo-u6', email: 'user6@example.com', color_nickname: 'Erguvan Mor #902', badge_color: '#A855F7' },
 ];
 
-// Generate last 30 days demo logs
+// Generate last 14 days demo logs
 function getInitialDemoLogs() {
   const logs = [];
   const today = new Date();
   
   INITIAL_DEMO_PROFILES.forEach((profile, index) => {
-    // Generate logs for last 14 days
     for (let d = 0; d < 14; d++) {
       const dateObj = new Date(today);
       dateObj.setDate(dateObj.getDate() - d);
@@ -40,15 +39,12 @@ function getInitialDemoLogs() {
       if ((d + index) % 3 === 0 && d !== 0) continue;
 
       const pageCount = 10 + Math.floor(Math.random() * 40);
-      const books = ['Sözler', 'Mektubat', 'Lem\'alar', 'Şualar', 'Tarihçe-i Hayat', 'Asa-yı Musa'];
-      const bookTitle = books[(d + index) % books.length];
 
       logs.push({
         id: `demo-log-${profile.id}-${dateStr}`,
         user_id: profile.id,
         log_date: dateStr,
         page_count: pageCount,
-        book_title: bookTitle,
         created_at: new Date(dateObj).toISOString(),
         profiles: {
           color_nickname: profile.color_nickname,
@@ -91,13 +87,11 @@ export const apiService = {
    */
   async signInWithEmail(email, password) {
     if (isSupabaseConfigured) {
-      // 1. Try signing in
       let { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      // 2. If user doesn't exist, sign up
       if (signInError && signInError.message.includes('Invalid login credentials')) {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
@@ -106,7 +100,6 @@ export const apiService = {
         if (signUpError) throw signUpError;
         authData = signUpData;
 
-        // Create profile with random color nickname
         if (authData.user) {
           const { nickname, hex } = generateRandomColorNickname();
           await supabase.from('profiles').insert([
@@ -121,7 +114,6 @@ export const apiService = {
         throw signInError;
       }
 
-      // Fetch profile
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -130,7 +122,6 @@ export const apiService = {
 
       return { user: authData.user, profile };
     } else {
-      // Mock Fallback Auth
       const profiles = getStoredProfiles();
       let profile = profiles.find((p) => p.email.toLowerCase() === email.toLowerCase());
 
@@ -186,23 +177,20 @@ export const apiService = {
   /**
    * Save Daily Reading Log
    */
-  async saveReadingLog({ userId, dateStr, pageCount, bookTitle, profile }) {
+  async saveReadingLog({ userId, dateStr, pageCount, profile }) {
     if (isSupabaseConfigured) {
-      // Upsert reading log for specified user & date
       const { data, error } = await supabase
         .from('reading_logs')
         .upsert({
           user_id: userId,
           log_date: dateStr,
-          page_count: parseInt(pageCount, 10),
-          book_title: bookTitle || null
+          page_count: parseInt(pageCount, 10)
         }, { onConflict: 'user_id,log_date' })
         .select();
 
       if (error) throw error;
       return data;
     } else {
-      // Mock Upsert
       const logs = getStoredLogs();
       const existingIndex = logs.findIndex(l => l.user_id === userId && l.log_date === dateStr);
 
@@ -211,7 +199,6 @@ export const apiService = {
         user_id: userId,
         log_date: dateStr,
         page_count: parseInt(pageCount, 10),
-        book_title: bookTitle || 'Risale-i Nur',
         created_at: new Date().toISOString(),
         profiles: {
           color_nickname: profile?.color_nickname || 'Anonim Okuyucu',
@@ -231,7 +218,7 @@ export const apiService = {
   },
 
   /**
-   * Fetch All Reading Logs (with profile join for public display)
+   * Fetch All Reading Logs
    */
   async fetchAllLogs() {
     if (isSupabaseConfigured) {
@@ -242,7 +229,6 @@ export const apiService = {
           user_id,
           log_date,
           page_count,
-          book_title,
           created_at,
           profiles (
             color_nickname,
