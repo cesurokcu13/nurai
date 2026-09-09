@@ -7,7 +7,7 @@ import PersonalProfile from './components/PersonalProfile';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import { apiService, isSupabaseConfigured } from './lib/supabase';
-import { Database } from 'lucide-react';
+import { Database, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function App() {
   const [userProfile, setUserProfile] = useState(null);
@@ -15,12 +15,12 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Initial Load: User session & all reading logs
+  // Initial Load: User session & all reading logs from Supabase
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       
-      // Load Current User Session
+      // Load Current User Session from Supabase
       const sessionData = await apiService.getCurrentUser();
       if (sessionData?.profile) {
         setUserProfile(sessionData.profile);
@@ -28,11 +28,11 @@ export default function App() {
         setUserProfile(null);
       }
 
-      // Load All Logs
+      // Load All Logs from Supabase
       const allLogs = await apiService.fetchAllLogs();
       setLogs(allLogs);
     } catch (err) {
-      console.error('Veri yüklenirken hata:', err);
+      console.error('Supabase verileri yüklenirken hata:', err);
     } finally {
       setLoading(false);
     }
@@ -55,14 +55,13 @@ export default function App() {
     await loadData();
   };
 
-  // Save Daily Reading Log
+  // Save Daily Reading Log directly to Supabase
   const handleSaveLog = async ({ dateStr, pageCount }) => {
     if (!userProfile) return;
     await apiService.saveReadingLog({
       userId: userProfile.id,
       dateStr,
-      pageCount,
-      profile: userProfile
+      pageCount
     });
     await loadData();
   };
@@ -104,12 +103,22 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        {/* Backend Demo Mode Notice Banner (if Supabase env vars not set) */}
-        {!isSupabaseConfigured && (
-          <div className="p-4 rounded-2xl bg-slate-900 border border-emerald-500/30 flex items-start sm:items-center gap-3 text-xs text-slate-300 shadow-lg">
-            <Database className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
+        {/* Supabase Connection Status Banner */}
+        {isSupabaseConfigured ? (
+          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 text-xs text-emerald-400 shadow-lg">
+            <div className="flex items-center gap-2 font-medium">
+              <Database className="h-4 w-4 text-emerald-400" />
+              <span>🟢 Supabase Canlı Veritabanı Bağlantısı Aktif</span>
+            </div>
+            <span className="flex items-center gap-1 text-[11px] text-emerald-400/80 bg-emerald-500/20 px-2.5 py-1 rounded-lg">
+              <ShieldCheck className="h-3.5 w-3.5" /> %100 Anonim Veri Güvenliği
+            </span>
+          </div>
+        ) : (
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start sm:items-center gap-3 text-xs text-amber-300 shadow-lg">
+            <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
             <div className="flex-1">
-              <span className="font-semibold text-emerald-400">Önizleme / Demo Modu Aktif:</span> Bu uygulama şu anda tarayıcı yerel hafızasında (LocalStorage) tam fonksiyonel çalışmaktadır. Kendi Supabase URL ve Key bilgilerinizi <code className="bg-slate-800 px-1.5 py-0.5 rounded text-emerald-300 font-mono">.env</code> dosyasına eklediğinizde canlı bulut veritabanına otomatik bağlanacaktır.
+              <span className="font-semibold text-amber-400">Supabase Bağlantı Uyarısı:</span> Canlı veritabanı bağlantısı için GitHub Repository ayarlarınızdan <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">Settings -&gt; Secrets -&gt; Actions</code> kısmına <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">VITE_SUPABASE_URL</code> ve <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">VITE_SUPABASE_ANON_KEY</code> ekleyiniz.
             </div>
           </div>
         )}
