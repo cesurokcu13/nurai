@@ -29,16 +29,10 @@ export const LETTER_PALETTES = [
   { letter: 'Z', name: 'Zümrüt Yeşil', hex: '#10B981', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
 ];
 
-/**
- * Strips any non-alphabetical characters keeping only Turkish/English letters and spaces.
- */
 export function sanitizeToLettersOnly(text = '') {
   return text.replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ\s]/g, '').trim();
 }
 
-/**
- * Returns ONLY the single uppercase initial letter of the nickname.
- */
 export function getInitialLetter(nickname = '') {
   const clean = sanitizeToLettersOnly(nickname);
   if (!clean) return 'A';
@@ -46,21 +40,48 @@ export function getInitialLetter(nickname = '') {
 }
 
 /**
- * Generates a random Turkish color nickname guaranteeing UNIQUE INITIAL LETTER
- * comparing against already used nicknames.
+ * Maps a list of logs/profiles so that every user ID receives a 100% UNIQUE initial letter.
  */
+export function getGuaranteedUniqueLetterMap(logs = []) {
+  const userLetterMap = {};
+  const usedLetters = new Set();
+
+  const userList = [];
+  const seenUsers = new Set();
+
+  logs.forEach((item) => {
+    const userId = item.user_id || item.id;
+    if (userId && !seenUsers.has(userId)) {
+      seenUsers.add(userId);
+      userList.push({
+        userId,
+        nickname: item.profiles?.color_nickname || item.color_nickname || 'Anonim'
+      });
+    }
+  });
+
+  userList.forEach((user) => {
+    const rawLetter = getInitialLetter(user.nickname);
+
+    if (!usedLetters.has(rawLetter)) {
+      usedLetters.add(rawLetter);
+      userLetterMap[user.userId] = rawLetter;
+    } else {
+      // Find unused letter from LETTER_PALETTES pool
+      const available = LETTER_PALETTES.find((p) => !usedLetters.has(p.letter));
+      const chosenLetter = available ? available.letter : rawLetter;
+      usedLetters.add(chosenLetter);
+      userLetterMap[user.userId] = chosenLetter;
+    }
+  });
+
+  return userLetterMap;
+}
+
 export function generateRandomColorNickname(existingNicknames = []) {
-  // Extract currently used initial letters
-  const usedLetters = new Set(
-    existingNicknames.map((n) => getInitialLetter(n))
-  );
+  const usedLetters = new Set(existingNicknames.map((n) => getInitialLetter(n)));
+  const availablePalettes = LETTER_PALETTES.filter((p) => !usedLetters.has(p.letter));
 
-  // Filter available palettes whose initial letter is not yet used
-  const availablePalettes = LETTER_PALETTES.filter(
-    (p) => !usedLetters.has(p.letter)
-  );
-
-  // If there are unused initial letters, pick one at random
   const palette = availablePalettes.length > 0
     ? availablePalettes[Math.floor(Math.random() * availablePalettes.length)]
     : LETTER_PALETTES[Math.floor(Math.random() * LETTER_PALETTES.length)];
@@ -72,18 +93,17 @@ export function generateRandomColorNickname(existingNicknames = []) {
   };
 }
 
-/**
- * Returns consistent Tailwind style classes for a given initial letter / nickname
- */
-export function getBadgeStyleForNickname(nickname = '') {
-  const initial = getInitialLetter(nickname);
+export function getBadgeStyleForNickname(letterOrNickname = '') {
+  const initial = letterOrNickname.length === 1
+    ? letterOrNickname.toUpperCase()
+    : getInitialLetter(letterOrNickname);
+
   const matched = LETTER_PALETTES.find((p) => p.letter === initial);
   if (matched) return matched;
 
-  // Fallback hash
   let hash = 0;
-  for (let i = 0; i < nickname.length; i++) {
-    hash = nickname.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < letterOrNickname.length; i++) {
+    hash = letterOrNickname.charCodeAt(i) + ((hash << 5) - hash);
   }
   const index = Math.abs(hash) % LETTER_PALETTES.length;
   return LETTER_PALETTES[index];

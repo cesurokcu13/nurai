@@ -1,11 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen } from 'lucide-react';
-import { getBadgeStyleForNickname, sanitizeToLettersOnly, getInitialLetter } from '../utils/nicknameGenerator';
+import { getBadgeStyleForNickname, getGuaranteedUniqueLetterMap } from '../utils/nicknameGenerator';
 
 export default function TablesSection({ logs }) {
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
 
   const todayStr = new Date().toISOString().split('T')[0];
+
+  // Guaranteed 100% Unique Letter Mapping per User ID
+  const uniqueLetterMap = useMemo(() => {
+    return getGuaranteedUniqueLetterMap(logs);
+  }, [logs]);
 
   // Helper date functions
   const getStartOfWeek = (d) => {
@@ -36,7 +41,7 @@ export default function TablesSection({ logs }) {
     logs.forEach((log) => {
       if (log.log_date >= startOfWeekStr) {
         const userId = log.user_id;
-        const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
+        const nickname = log.profiles?.color_nickname || 'Anonim';
         const badgeColor = log.profiles?.badge_color || '#10B981';
 
         if (!userMap[userId]) {
@@ -67,7 +72,7 @@ export default function TablesSection({ logs }) {
     logs.forEach((log) => {
       if (log.log_date >= startOfMonthStr) {
         const userId = log.user_id;
-        const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
+        const nickname = log.profiles?.color_nickname || 'Anonim';
         const badgeColor = log.profiles?.badge_color || '#10B981';
 
         if (!userMap[userId]) {
@@ -100,7 +105,7 @@ export default function TablesSection({ logs }) {
             Okuma Tabloları & Sıralama
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Okuyucuların sıralamayı takip edebilmesi için sadece baş harfleri gösterilmektedir.
+            Her kullanıcı için tamamen çakışmasız, %100 eşsiz baş harf rozeti gösterilmektedir.
           </p>
         </div>
 
@@ -172,9 +177,8 @@ export default function TablesSection({ logs }) {
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {todayLogs.map((log, index) => {
-                    const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
-                    const badgeStyle = getBadgeStyleForNickname(nickname);
-                    const initialLetter = getInitialLetter(nickname);
+                    const letter = uniqueLetterMap[log.user_id] || 'A';
+                    const badgeStyle = getBadgeStyleForNickname(letter);
 
                     return (
                       <tr key={log.id} className="hover:bg-slate-800/40 transition">
@@ -183,7 +187,7 @@ export default function TablesSection({ logs }) {
                         </td>
                         <td className="py-3.5 px-3">
                           <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {initialLetter}
+                            {letter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
@@ -226,8 +230,8 @@ export default function TablesSection({ logs }) {
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {weeklyLeaderboard.map((item, index) => {
-                    const badgeStyle = getBadgeStyleForNickname(item.nickname);
-                    const initialLetter = getInitialLetter(item.nickname);
+                    const letter = uniqueLetterMap[item.userId] || 'A';
+                    const badgeStyle = getBadgeStyleForNickname(letter);
 
                     return (
                       <tr key={item.userId} className="hover:bg-slate-800/40 transition">
@@ -244,7 +248,7 @@ export default function TablesSection({ logs }) {
                         </td>
                         <td className="py-3.5 px-3">
                           <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {initialLetter}
+                            {letter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
@@ -292,8 +296,8 @@ export default function TablesSection({ logs }) {
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {monthlyLeaderboard.map((item, index) => {
-                    const badgeStyle = getBadgeStyleForNickname(item.nickname);
-                    const initialLetter = getInitialLetter(item.nickname);
+                    const letter = uniqueLetterMap[item.userId] || 'A';
+                    const badgeStyle = getBadgeStyleForNickname(letter);
 
                     return (
                       <tr key={item.userId} className="hover:bg-slate-800/40 transition">
@@ -302,7 +306,7 @@ export default function TablesSection({ logs }) {
                         </td>
                         <td className="py-3.5 px-3">
                           <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {initialLetter}
+                            {letter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
@@ -327,7 +331,7 @@ export default function TablesSection({ logs }) {
       <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-          Kullanıcı isimleri gizlidir. Tabloda sadece sıralamayı takip etmeye yarayan baş harf gösterilmektedir.
+          Kullanıcı isimleri gizlidir. Her okuyucu için %100 eşsiz ve çakışmasız tek bir baş harf gösterilmektedir.
         </span>
       </div>
 
