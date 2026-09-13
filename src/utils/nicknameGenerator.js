@@ -21,6 +21,13 @@ const ADJECTIVES = [
 ];
 
 /**
+ * Strips any non-alphabetical characters (numbers, hashes, symbols) keeping only Turkish/English letters and spaces.
+ */
+export function sanitizeToLettersOnly(text = '') {
+  return text.replace(/[^a-zA-ZçğıöşüÇĞİÖŞÜ\s]/g, '').trim();
+}
+
+/**
  * Generates a random Turkish color nickname consisting STRICTLY OF LETTERS ONLY (no numbers, no hashes).
  * E.g., "Nurlu Zümrüt Yeşil", "Halis Safir Mavi", "Latif Yakut Kırmızı"
  */
@@ -28,8 +35,7 @@ export function generateRandomColorNickname() {
   const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
   const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
   
-  // Pure letter nickname without any numbers or hash symbols
-  const nickname = `${adjective} ${palette.name}`;
+  const nickname = sanitizeToLettersOnly(`${adjective} ${palette.name}`);
   return {
     nickname,
     hex: palette.hex,
@@ -41,11 +47,12 @@ export function generateRandomColorNickname() {
  * Returns consistent Tailwind style classes for a given letter nickname
  */
 export function getBadgeStyleForNickname(nickname = '') {
-  if (!nickname) return COLOR_PALETTES[0];
+  const cleanNickname = sanitizeToLettersOnly(nickname);
+  if (!cleanNickname) return COLOR_PALETTES[0];
   
   let hash = 0;
-  for (let i = 0; i < nickname.length; i++) {
-    hash = nickname.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < cleanNickname.length; i++) {
+    hash = cleanNickname.charCodeAt(i) + ((hash << 5) - hash);
   }
   const index = Math.abs(hash) % COLOR_PALETTES.length;
   return COLOR_PALETTES[index];

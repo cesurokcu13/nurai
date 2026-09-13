@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen } from 'lucide-react';
-import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
+import { getBadgeStyleForNickname, sanitizeToLettersOnly } from '../utils/nicknameGenerator';
 
 export default function TablesSection({ logs }) {
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
@@ -36,7 +36,7 @@ export default function TablesSection({ logs }) {
     logs.forEach((log) => {
       if (log.log_date >= startOfWeekStr) {
         const userId = log.user_id;
-        const nickname = log.profiles?.color_nickname || 'Anonim Okuyucu';
+        const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
         const badgeColor = log.profiles?.badge_color || '#10B981';
 
         if (!userMap[userId]) {
@@ -67,7 +67,7 @@ export default function TablesSection({ logs }) {
     logs.forEach((log) => {
       if (log.log_date >= startOfMonthStr) {
         const userId = log.user_id;
-        const nickname = log.profiles?.color_nickname || 'Anonim Okuyucu';
+        const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
         const badgeColor = log.profiles?.badge_color || '#10B981';
 
         if (!userMap[userId]) {
@@ -100,7 +100,7 @@ export default function TablesSection({ logs }) {
             Okuma Tabloları & Sıralama
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Anonim renk takma adları ile günlük, haftalık ve aylık okuma takibi.
+            Sadece harflerden oluşan anonim takma adlar ile günlük, haftalık ve aylık okuma takibi.
           </p>
         </div>
 
@@ -172,7 +172,7 @@ export default function TablesSection({ logs }) {
                 </thead>
                 <tbody className="divide-y divide-slate-800/60">
                   {todayLogs.map((log, index) => {
-                    const nickname = log.profiles?.color_nickname || 'Anonim Okuyucu';
+                    const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
                     const badgeStyle = getBadgeStyleForNickname(nickname);
                     return (
                       <tr key={log.id} className="hover:bg-slate-800/40 transition">
@@ -180,12 +180,9 @@ export default function TablesSection({ logs }) {
                           {index === 0 ? '🥇 1.' : index === 1 ? '🥈 2.' : index === 2 ? '🥉 3.' : `${index + 1}.`}
                         </td>
                         <td className="py-3.5 px-3">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl border ${badgeStyle.bg} ${badgeStyle.border}`}>
-                            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: log.profiles?.badge_color || badgeStyle.hex }}></span>
-                            <span className={`text-xs font-semibold ${badgeStyle.text}`}>
-                              {nickname}
-                            </span>
-                          </div>
+                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {nickname}
+                          </span>
                         </td>
                         <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
                           {log.page_count} sayfa
@@ -242,12 +239,9 @@ export default function TablesSection({ logs }) {
                           )}
                         </td>
                         <td className="py-3.5 px-3">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl border ${badgeStyle.bg} ${badgeStyle.border}`}>
-                            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.badgeColor || badgeStyle.hex }}></span>
-                            <span className={`text-xs font-semibold ${badgeStyle.text}`}>
-                              {item.nickname}
-                            </span>
-                          </div>
+                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {item.nickname}
+                          </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
                           <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
@@ -301,12 +295,9 @@ export default function TablesSection({ logs }) {
                           {index + 1}.
                         </td>
                         <td className="py-3.5 px-3">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-xl border ${badgeStyle.bg} ${badgeStyle.border}`}>
-                            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.badgeColor || badgeStyle.hex }}></span>
-                            <span className={`text-xs font-semibold ${badgeStyle.text}`}>
-                              {item.nickname}
-                            </span>
-                          </div>
+                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {item.nickname}
+                          </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
                           <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
@@ -330,7 +321,7 @@ export default function TablesSection({ logs }) {
       <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-          Kullanıcı isimleri ve e-postaları gizlidir. Sadece renkli takma adlar gösterilir.
+          Kullanıcı isimleri ve e-postaları gizlidir. Sadece harflerden oluşan renkli takma adlar gösterilir.
         </span>
       </div>
 
