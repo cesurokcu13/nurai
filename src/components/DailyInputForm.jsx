@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookPlus, Calendar, CheckCircle2, Lock, Sparkles } from 'lucide-react';
+import { BookPlus, Calendar, CheckCircle2, Lock, Sparkles, Clock, AlertTriangle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
@@ -9,6 +9,51 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
   const [pageCount, setPageCount] = useState('');
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+
+  // Live Timer State for 23:30 Deadline
+  const [timeRemaining, setTimeRemaining] = useState({
+    formatted: '00:00:00',
+    isPastDeadline: false,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
+
+  // Countdown Interval Effect (Updates every second)
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 30, 0);
+      const diffMs = deadline.getTime() - now.getTime();
+
+      if (diffMs > 0) {
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        const pad = (n) => n.toString().padStart(2, '0');
+        setTimeRemaining({
+          formatted: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`,
+          isPastDeadline: false,
+          hours,
+          minutes,
+          seconds
+        });
+      } else {
+        setTimeRemaining({
+          formatted: '00:00:00',
+          isPastDeadline: true,
+          hours: 0,
+          minutes: 0,
+          seconds: 0
+        });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Auto-fill existing entry if user already logged for selected date
   useEffect(() => {
@@ -24,10 +69,18 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
     }
   }, [userProfile, logs, dateStr]);
 
+  const isTodaySelected = dateStr === todayStr;
+  const isInputDisabled = isTodaySelected && timeRemaining.isPastDeadline;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userProfile) {
       onOpenAuth();
+      return;
+    }
+
+    if (isInputDisabled) {
+      alert('Bugün için veri girişi saat 23:30 itibarıyla kapanmıştır.');
       return;
     }
 
@@ -42,7 +95,6 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
 
       setSuccessMsg('Okumanız başarıyla kaydedildi! Maşallah 🌟');
       
-      // Trigger celebrate confetti
       confetti({
         particleCount: 80,
         spread: 60,
@@ -60,11 +112,13 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
   const badgeStyle = userProfile ? getBadgeStyleForNickname(userProfile.color_nickname) : null;
 
   return (
-    <div className="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-slate-800 shadow-xl">
-      {/* Subtle background gradient glow */}
+    <div className="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-slate-800 shadow-xl space-y-6">
+      
+      {/* Background Glow */}
       <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      {/* Header Info Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -96,13 +150,60 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
         )}
       </div>
 
+      {/* ⏳ LIVE COUNTDOWN TIMER CARD (23:30 DEADLINE) */}
+      <div className={`p-4 rounded-2xl border transition-all ${
+        timeRemaining.isPastDeadline
+          ? 'bg-red-500/10 border-red-500/30 text-red-300'
+          : 'bg-slate-900/90 border-amber-500/30 text-slate-200'
+      }`}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-xl ${
+              timeRemaining.isPastDeadline
+                ? 'bg-red-500/20 text-red-400'
+                : 'bg-amber-500/10 text-amber-400'
+            }`}>
+              {timeRemaining.isPastDeadline ? (
+                <AlertTriangle className="h-5 w-5" />
+              ) : (
+                <Clock className="h-5 w-5 animate-pulse" />
+              )}
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <span>Son Veri Girişi Saati:</span>
+                <span className="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                  23:30
+                </span>
+              </p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {timeRemaining.isPastDeadline
+                  ? 'Bugünkü okuma girişi 23:30 itibarıyla tamamlanmıştır. Yeni kayıtlar 00:00 itibarıyla başlayacaktır.'
+                  : 'Günün verilerini kaydetmek için kalan süreniz:'}
+              </p>
+            </div>
+          </div>
+
+          {/* Countdown Clock Display */}
+          {!timeRemaining.isPastDeadline && (
+            <div className="flex items-center gap-1.5 bg-slate-950 px-4 py-2 rounded-xl border border-amber-500/30 self-stretch sm:self-auto justify-center">
+              <span className="font-mono text-lg font-extrabold text-amber-400 tracking-wider">
+                {timeRemaining.formatted}
+              </span>
+              <span className="text-[10px] text-slate-400 font-medium uppercase ml-1">Kalan Süre</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {successMsg && (
-        <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold flex items-center gap-3 animate-fadeIn">
+        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold flex items-center gap-3 animate-fadeIn">
           <CheckCircle2 className="h-5 w-5 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
+      {/* Input Form */}
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-4">
         {/* Date Selector */}
         <div className="sm:col-span-5">
@@ -132,10 +233,11 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
               min="1"
               max="1000"
               required
-              placeholder="Örn: 20"
+              disabled={isInputDisabled}
+              placeholder={isInputDisabled ? 'Kapanmıştır' : 'Örn: 20'}
               value={pageCount}
               onChange={(e) => setPageCount(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-semibold placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-semibold placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <span className="absolute right-3.5 top-3 text-xs text-slate-500 font-medium">sayfa</span>
           </div>
@@ -145,11 +247,16 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
         <div className="sm:col-span-3 flex items-end">
           <button
             type="submit"
-            disabled={saving}
-            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 disabled:opacity-50"
+            disabled={saving || isInputDisabled}
+            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? (
               <span className="animate-spin">⏳</span>
+            ) : isInputDisabled ? (
+              <>
+                <Lock className="h-4 w-4" />
+                Giriş Kapanmıştır (23:30)
+              </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />

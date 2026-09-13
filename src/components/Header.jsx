@@ -1,9 +1,38 @@
-import React from 'react';
-import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
 export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
   const badgeStyle = userProfile ? getBadgeStyleForNickname(userProfile.color_nickname) : null;
+
+  // Countdown timer for 23:30 deadline
+  const [countdownText, setCountdownText] = useState('00:00:00');
+  const [isPastDeadline, setIsPastDeadline] = useState(false);
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 30, 0);
+      const diffMs = deadline.getTime() - now.getTime();
+
+      if (diffMs > 0) {
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        const pad = (n) => n.toString().padStart(2, '0');
+        setCountdownText(`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`);
+        setIsPastDeadline(false);
+      } else {
+        setCountdownText('00:00:00');
+        setIsPastDeadline(true);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <header className="relative border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30">
@@ -19,7 +48,7 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
               <BookOpen className="h-6 w-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
                   Risale-i Nur Okuma Halkası
                 </h1>
@@ -33,8 +62,23 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
             </div>
           </div>
 
-          {/* User Auth Status / Anonymous Identity */}
-          <div className="flex items-center justify-between md:justify-end gap-3">
+          {/* Right Header Controls & Live Countdown Pill */}
+          <div className="flex flex-wrap items-center justify-between md:justify-end gap-3">
+            
+            {/* Live 23:30 Countdown Pill */}
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold ${
+              isPastDeadline
+                ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+            }`}>
+              <Clock className="h-3.5 w-3.5" />
+              <span>Giriş Kapanışı 23:30</span>
+              <span className="font-mono text-white font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-700">
+                {isPastDeadline ? 'Kapadı' : countdownText}
+              </span>
+            </div>
+
+            {/* Auth Status */}
             {userProfile ? (
               <div className="flex items-center gap-3">
                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border ${badgeStyle.bg} ${badgeStyle.border}`}>
