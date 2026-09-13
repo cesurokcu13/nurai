@@ -28,14 +28,23 @@ export function sanitizeToLettersOnly(text = '') {
 }
 
 /**
- * Generates a random Turkish color nickname consisting STRICTLY OF LETTERS ONLY (no numbers, no hashes).
- * E.g., "Nurlu Zümrüt Yeşil", "Halis Safir Mavi", "Latif Yakut Kırmızı"
+ * Returns ONLY the single uppercase initial letter of the nickname.
+ * E.g., "Zümrüt Yeşil" -> "Z", "Safir Mavi" -> "S"
+ */
+export function getInitialLetter(nickname = '') {
+  const clean = sanitizeToLettersOnly(nickname);
+  if (!clean) return 'A';
+  return clean.charAt(0).toUpperCase();
+}
+
+/**
+ * Generates a random Turkish color nickname consisting STRICTLY OF LETTERS ONLY.
  */
 export function generateRandomColorNickname() {
   const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
   const adjective = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
   
-  const nickname = sanitizeToLettersOnly(`${adjective} ${palette.name}`);
+  const nickname = sanitizeToLettersOnly(`${palette.name}`);
   return {
     nickname,
     hex: palette.hex,
@@ -44,7 +53,7 @@ export function generateRandomColorNickname() {
 }
 
 /**
- * Returns consistent Tailwind style classes for a given letter nickname
+ * Returns consistent Tailwind style classes for a given nickname
  */
 export function getBadgeStyleForNickname(nickname = '') {
   const cleanNickname = sanitizeToLettersOnly(nickname);

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen } from 'lucide-react';
-import { getBadgeStyleForNickname, sanitizeToLettersOnly } from '../utils/nicknameGenerator';
+import { getBadgeStyleForNickname, sanitizeToLettersOnly, getInitialLetter } from '../utils/nicknameGenerator';
 
 export default function TablesSection({ logs }) {
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
@@ -100,7 +100,7 @@ export default function TablesSection({ logs }) {
             Okuma Tabloları & Sıralama
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Sadece harflerden oluşan anonim takma adlar ile günlük, haftalık ve aylık okuma takibi.
+            Okuyucuların sıralamayı takip edebilmesi için sadece baş harfleri gösterilmektedir.
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export default function TablesSection({ logs }) {
                 <thead>
                   <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                     <th className="pb-3 px-3">Sıra</th>
-                    <th className="pb-3 px-3">Anonim Okuyucu</th>
+                    <th className="pb-3 px-3">Okuyucu Kodu</th>
                     <th className="pb-3 px-3 text-right">Sayfa Sayısı</th>
                   </tr>
                 </thead>
@@ -174,14 +174,16 @@ export default function TablesSection({ logs }) {
                   {todayLogs.map((log, index) => {
                     const nickname = sanitizeToLettersOnly(log.profiles?.color_nickname || 'Anonim Okuyucu');
                     const badgeStyle = getBadgeStyleForNickname(nickname);
+                    const initialLetter = getInitialLetter(nickname);
+
                     return (
                       <tr key={log.id} className="hover:bg-slate-800/40 transition">
                         <td className="py-3.5 px-3 font-semibold text-slate-400 text-xs">
                           {index === 0 ? '🥇 1.' : index === 1 ? '🥈 2.' : index === 2 ? '🥉 3.' : `${index + 1}.`}
                         </td>
                         <td className="py-3.5 px-3">
-                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {nickname}
+                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {initialLetter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
@@ -217,7 +219,7 @@ export default function TablesSection({ logs }) {
                 <thead>
                   <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                     <th className="pb-3 px-3">Derece</th>
-                    <th className="pb-3 px-3">Anonim Okuyucu</th>
+                    <th className="pb-3 px-3">Okuyucu Kodu</th>
                     <th className="pb-3 px-3 text-center">Aktif Gün</th>
                     <th className="pb-3 px-3 text-right">Haftalık Toplam</th>
                   </tr>
@@ -225,6 +227,8 @@ export default function TablesSection({ logs }) {
                 <tbody className="divide-y divide-slate-800/60">
                   {weeklyLeaderboard.map((item, index) => {
                     const badgeStyle = getBadgeStyleForNickname(item.nickname);
+                    const initialLetter = getInitialLetter(item.nickname);
+
                     return (
                       <tr key={item.userId} className="hover:bg-slate-800/40 transition">
                         <td className="py-3.5 px-3 font-semibold text-xs">
@@ -239,8 +243,8 @@ export default function TablesSection({ logs }) {
                           )}
                         </td>
                         <td className="py-3.5 px-3">
-                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {item.nickname}
+                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {initialLetter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
@@ -281,7 +285,7 @@ export default function TablesSection({ logs }) {
                 <thead>
                   <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
                     <th className="pb-3 px-3">Sıra</th>
-                    <th className="pb-3 px-3">Anonim Okuyucu</th>
+                    <th className="pb-3 px-3">Okuyucu Kodu</th>
                     <th className="pb-3 px-3 text-center">Okuma Gün Sayısı</th>
                     <th className="pb-3 px-3 text-right">Aylık Toplam</th>
                   </tr>
@@ -289,14 +293,16 @@ export default function TablesSection({ logs }) {
                 <tbody className="divide-y divide-slate-800/60">
                   {monthlyLeaderboard.map((item, index) => {
                     const badgeStyle = getBadgeStyleForNickname(item.nickname);
+                    const initialLetter = getInitialLetter(item.nickname);
+
                     return (
                       <tr key={item.userId} className="hover:bg-slate-800/40 transition">
                         <td className="py-3.5 px-3 font-semibold text-xs text-slate-400">
                           {index + 1}.
                         </td>
                         <td className="py-3.5 px-3">
-                          <span className={`inline-block px-3 py-1 rounded-xl border text-xs font-semibold ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {item.nickname}
+                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                            {initialLetter}
                           </span>
                         </td>
                         <td className="py-3.5 px-3 text-center text-xs text-slate-300">
@@ -321,7 +327,7 @@ export default function TablesSection({ logs }) {
       <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-          Kullanıcı isimleri ve e-postaları gizlidir. Sadece harflerden oluşan renkli takma adlar gösterilir.
+          Kullanıcı isimleri gizlidir. Tabloda sadece sıralamayı takip etmeye yarayan baş harf gösterilmektedir.
         </span>
       </div>
 
