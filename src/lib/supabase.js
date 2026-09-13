@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { generateRandomColorNickname } from '../utils/nicknameGenerator';
+import { generateRandomColorNickname, getInitialLetter } from '../utils/nicknameGenerator';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -15,8 +15,56 @@ export const supabase = isSupabaseConfigured
   : null;
 
 // ========================================================
-// PURE SUPABASE SERVICE (No LocalStorage / No Mock Fallback)
+// PURE SUPABASE SERVICE (With Unique Initial Letter Logic)
 // ========================================================
+
+/**
+ * Self-healing helper: Checks all profiles in Supabase for duplicate initial letters
+ * and updates any duplicates so every single user has a unique initial letter.
+ */
+async function fixDuplicateProfiles(profiles = []) {
+  if (!supabase || !profiles || profiles.length <= 1) return profiles;
+
+  const usedLetters = new Set();
+  const duplicatesToFix = [];
+
+  profiles.forEach((p) => {
+    const letter = getInitialLetter(p.color_nickname);
+    if (usedLetters.has(letter)) {
+      duplicatesToFix.push(p);
+    } else {
+      usedLetters.add(letter);
+    }
+  });
+
+  if (duplicatesToFix.length === 0) return profiles;
+
+  console.log(`Bilinçli Düzeltme: ${duplicatesToFix.length} adet mükerrer baş harfli profil eşsizleştiriliyor...`);
+
+  const updatedProfiles = [...profiles];
+  for (const dup of duplicatesToFix) {
+    const existingNicknames = Array.from(usedLetters).map((l) => `${l} Profile`);
+    const { nickname, hex } = generateRandomColorNickname(existingNicknames);
+    
+    // Add newly assigned letter to set
+    usedLetters.add(getInitialLetter(nickname));
+
+    // Update in Supabase
+    await supabase.from('profiles').update({
+      color_nickname: nickname,
+      badge_color: hex
+    }).eq('id', dup.id);
+
+    // Update local profile object
+    const index = updatedProfiles.findIndex((p) => p.id === dup.id);
+    if (index >= 0) {
+      updatedProfiles[index].color_nickname = nickname;
+      updatedProfiles[index].badge_color = hex;
+    }
+  }
+
+  return updatedProfiles;
+}
 
 export const apiService = {
   /**
@@ -45,9 +93,12 @@ export const apiService = {
       if (signUpError) throw signUpError;
       authData = signUpData;
 
-      // Create profile in Supabase `profiles` table with random color nickname
+      // Create profile in Supabase `profiles` table with UNIQUE initial letter
       if (authData.user) {
-        const { nickname, hex } = generateRandomColorNickname();
+        const { data: existingProfiles } = await supabase.from('profiles').select('color_nickname');
+        const existingNicknames = (existingProfiles || []).map((p) => p.color_nickname);
+        const { nickname, hex } = generateRandomColorNickname(existingNicknames);
+
         const { error: profileErr } = await supabase.from('profiles').upsert([
           {
             id: authData.user.id,
@@ -62,18 +113,19 @@ export const apiService = {
     }
 
     // 3. Fetch profile from Supabase
-    const { data: profile, error: fetchProfileErr } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authData.user.id)
       .single();
 
-    if (fetchProfileErr && !profile) {
-      // Create fallback profile if missing
-      const { nickname, hex } = generateRandomColorNickname();
-      const newProfile = { id: authData.user.id, color_nickname: nickname, badge_color: hex };
-      await supabase.from('profiles').upsert([newProfile]);
-      return { user: authData.user, profile: newProfile };
+    if (!profile && authData.user) {
+      const { data: existingProfiles } = await supabase.from('profiles').select('color_nickname');
+      const existingNicknames = (existingProfiles || []).map((p) => p.color_nickname);
+      const { nickname, hex } = generateRandomColorNickname(existingNicknames);
+
+      profile = { id: authData.user.id, color_nickname: nickname, badge_color: hex };
+      await supabase.from('profiles').upsert([profile]);
     }
 
     return { user: authData.user, profile };
@@ -113,7 +165,6 @@ export const apiService = {
       throw new Error('Supabase veritabanı bağlantısı bulunamadı.');
     }
 
-    // Upsert reading log into Supabase `reading_logs` table
     const { data, error } = await supabase
       .from('reading_logs')
       .upsert({
@@ -128,10 +179,16 @@ export const apiService = {
   },
 
   /**
-   * Fetch All Reading Logs directly from Supabase (with profiles join)
+   * Fetch All Reading Logs directly from Supabase (with unique initial letter check)
    */
   async fetchAllLogs() {
     if (!isSupabaseConfigured) return [];
+
+    // Check & Fix duplicate profiles in database
+    const { data: allProfiles } = await supabase.from('profiles').select('*');
+    if (allProfiles && allProfiles.length > 0) {
+      await fixDuplicateProfiles(allProfiles);
+    }
 
     const { data, error } = await supabase
       .from('reading_logs')
