@@ -10,7 +10,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
   const [saving, setSaving] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Live Timer State for 23:50 Deadline
+  // Live Timer State for 23:30 Deadline
   const [timeRemaining, setTimeRemaining] = useState({
     formatted: '00:00:00',
     isPastDeadline: false,
@@ -19,11 +19,11 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
     seconds: 0
   });
 
-  // Countdown Interval Effect (Target: 23:50:00)
+  // Countdown Interval Effect (Target: 23:30:00)
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date();
-      const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 50, 0);
+      const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 30, 0);
       const diffMs = deadline.getTime() - now.getTime();
 
       if (diffMs > 0) {
@@ -80,7 +80,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
     }
 
     if (isInputDisabled) {
-      alert('Bugün için veri girişi saat 23:50 itibarıyla kapanmıştır.');
+      alert('Bugün için veri girişi saat 23:30 itibarıyla kapanmıştır.');
       return;
     }
 
@@ -150,7 +150,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
         )}
       </div>
 
-      {/* ⏳ LIVE COUNTDOWN TIMER CARD (23:50 EXTENDED DEADLINE) */}
+      {/* ⏳ LIVE COUNTDOWN TIMER CARD (23:30 DEADLINE) */}
       <div className={`p-4 rounded-2xl border transition-all ${
         timeRemaining.isPastDeadline
           ? 'bg-red-500/10 border-red-500/30 text-red-300'
@@ -173,13 +173,13 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
               <p className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                 <span>Son Veri Girişi Saati:</span>
                 <span className="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                  23:50 (Uzatıldı ⏳)
+                  23:30 ⏳
                 </span>
               </p>
               <p className="text-[11px] text-slate-400 mt-0.5">
                 {timeRemaining.isPastDeadline
-                  ? 'Bugünkü okuma girişi 23:50 itibarıyla tamamlanmıştır. Yeni kayıtlar 00:00 itibarıyla başlayacaktır.'
-                  : 'Bugünlük özel izinle veri girişi 23:50\'ye kadar uzatılmıştır:'}
+                  ? 'Bugünkü okuma girişi 23:30 itibarıyla tamamlanmıştır. Yeni kayıtlar 00:00 itibarıyla başlayacaktır.'
+                  : 'Bugünlük veri girişi 23:30\'a kadar yapılabilir:'}
               </p>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
             ) : isInputDisabled ? (
               <>
                 <Lock className="h-4 w-4" />
-                Giriş Kapanmıştır (23:50)
+                Giriş Kapanmıştır (23:30)
               </>
             ) : (
               <>
