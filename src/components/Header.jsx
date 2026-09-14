@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock } from 'lucide-react';
+import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock, Lock } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
 export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
@@ -115,7 +115,15 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
             </div>
             <div>
               <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Bugün Okunan</p>
-              <p className="text-xl font-extrabold text-white">{stats.todayPages.toLocaleString('tr-TR')} Sayfa</p>
+              <div className="text-xl font-extrabold text-white">
+                {isPastDeadline ? (
+                  `${stats.todayPages.toLocaleString('tr-TR')} Sayfa`
+                ) : (
+                  <span className="flex items-center gap-1.5 text-amber-400 text-sm font-semibold">
+                    <Lock className="h-4 w-4" /> 23:30'da Açılacak
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -125,7 +133,15 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
             </div>
             <div>
               <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Bugünkü Okuyucu</p>
-              <p className="text-xl font-extrabold text-white">{stats.todayReadersCount} Kişi</p>
+              <div className="text-xl font-extrabold text-white">
+                {isPastDeadline ? (
+                  `${stats.todayReadersCount} Kişi`
+                ) : (
+                  <span className="flex items-center gap-1.5 text-amber-400 text-sm font-semibold">
+                    <Lock className="h-4 w-4" /> 23:30'da Açılacak
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -135,7 +151,15 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats }) {
             </div>
             <div>
               <p className="text-xs text-slate-400 uppercase tracking-wider font-medium">Toplam Okunan</p>
-              <p className="text-xl font-extrabold text-white">{stats.totalAllTimePages.toLocaleString('tr-TR')} Sayfa</p>
+              <div className="text-xl font-extrabold text-white">
+                {isPastDeadline ? (
+                  `${stats.totalAllTimePages.toLocaleString('tr-TR')} Sayfa`
+                ) : (
+                  <span className="flex items-center gap-1.5 text-amber-400 text-sm font-semibold">
+                    <Lock className="h-4 w-4" /> 23:30'da Açılacak
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
