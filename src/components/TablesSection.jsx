@@ -1,9 +1,27 @@
-import React, { useState, useMemo } from 'react';
-import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Calendar, Award, Flame, Clock, ShieldCheck, BookOpen, Lock } from 'lucide-react';
 import { getBadgeStyleForNickname, getGuaranteedUniqueLetterMap } from '../utils/nicknameGenerator';
 
 export default function TablesSection({ logs }) {
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
+
+  // Daily Table is unlocked only between 23:30 and 23:59:59
+  const [isDailyTableVisible, setIsDailyTableVisible] = useState(() => {
+    const now = new Date();
+    return now.getHours() === 23 && now.getMinutes() >= 30;
+  });
+
+  useEffect(() => {
+    const checkVisibility = () => {
+      const now = new Date();
+      const visible = now.getHours() === 23 && now.getMinutes() >= 30;
+      setIsDailyTableVisible(visible);
+    };
+
+    checkVisibility();
+    const interval = setInterval(checkVisibility, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -121,6 +139,9 @@ export default function TablesSection({ logs }) {
           >
             <Clock className="h-3.5 w-3.5" />
             Günlük Tablo
+            {!isDailyTableVisible && (
+              <Lock className="h-3 w-3 text-amber-400 ml-0.5" />
+            )}
           </button>
 
           <button
@@ -152,53 +173,71 @@ export default function TablesSection({ logs }) {
       {/* 1. GÜNLÜK TABLO */}
       {activeTab === 'daily' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Bugünün Kayıtları ({todayStr})</span>
-            <span className="font-semibold text-emerald-400">
-              Toplam: {todayLogs.reduce((acc, curr) => acc + curr.page_count, 0)} Sayfa
-            </span>
-          </div>
-
-          {todayLogs.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
-              <BookOpen className="h-10 w-10 text-slate-600 mx-auto mb-2" />
-              <p className="text-sm font-medium text-slate-400">Bugün henüz okuma kaydı girilmedi.</p>
-              <p className="text-xs text-slate-500 mt-1">Yukarıdaki formdan ilk kaydı siz oluşturun!</p>
+          {!isDailyTableVisible ? (
+            <div className="text-center py-12 px-4 border border-dashed border-amber-500/30 bg-slate-900/60 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-white">Günlük Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Günlük okuma sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 font-mono">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                <span>Açılış Saati: 23:30</span>
+              </div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
-                    <th className="pb-3 px-3">Sıra</th>
-                    <th className="pb-3 px-3">Okuyucu Kodu</th>
-                    <th className="pb-3 px-3 text-right">Sayfa Sayısı</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {todayLogs.map((log, index) => {
-                    const letter = uniqueLetterMap[log.user_id] || 'A';
-                    const badgeStyle = getBadgeStyleForNickname(letter);
+            <>
+              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span>Bugünün Kayıtları ({todayStr})</span>
+                <span className="font-semibold text-emerald-400">
+                  Toplam: {todayLogs.reduce((acc, curr) => acc + curr.page_count, 0)} Sayfa
+                </span>
+              </div>
 
-                    return (
-                      <tr key={log.id} className="hover:bg-slate-800/40 transition">
-                        <td className="py-3.5 px-3 font-semibold text-slate-400 text-xs">
-                          {index === 0 ? '🥇 1.' : index === 1 ? '🥈 2.' : index === 2 ? '🥉 3.' : `${index + 1}.`}
-                        </td>
-                        <td className="py-3.5 px-3">
-                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {letter}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
-                          {log.page_count} sayfa
-                        </td>
+              {todayLogs.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
+                  <BookOpen className="h-10 w-10 text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-slate-400">Bugün henüz okuma kaydı girilmedi.</p>
+                  <p className="text-xs text-slate-500 mt-1">Yukarıdaki formdan ilk kaydı siz oluşturun!</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
+                        <th className="pb-3 px-3">Sıra</th>
+                        <th className="pb-3 px-3">Okuyucu Kodu</th>
+                        <th className="pb-3 px-3 text-right">Sayfa Sayısı</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {todayLogs.map((log, index) => {
+                        const letter = uniqueLetterMap[log.user_id] || 'A';
+                        const badgeStyle = getBadgeStyleForNickname(letter);
+
+                        return (
+                          <tr key={log.id} className="hover:bg-slate-800/40 transition">
+                            <td className="py-3.5 px-3 font-semibold text-slate-400 text-xs">
+                              {index === 0 ? '🥇 1.' : index === 1 ? '🥈 2.' : index === 2 ? '🥉 3.' : `${index + 1}.`}
+                            </td>
+                            <td className="py-3.5 px-3">
+                              <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                                {letter}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-right font-extrabold text-emerald-400">
+                              {log.page_count} sayfa
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
