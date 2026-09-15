@@ -5,8 +5,8 @@ import { getBadgeStyleForNickname, getGuaranteedUniqueLetterMap } from '../utils
 export default function TablesSection({ logs }) {
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'weekly' | 'monthly'
 
-  // Daily Table is unlocked only between 23:30 and 23:59:59
-  const [isDailyTableVisible, setIsDailyTableVisible] = useState(() => {
+  // Tables are unlocked only between 23:30 and 23:59:59
+  const [isUnlocked, setIsUnlocked] = useState(() => {
     const now = new Date();
     return now.getHours() === 23 && now.getMinutes() >= 30;
   });
@@ -15,7 +15,7 @@ export default function TablesSection({ logs }) {
     const checkVisibility = () => {
       const now = new Date();
       const visible = now.getHours() === 23 && now.getMinutes() >= 30;
-      setIsDailyTableVisible(visible);
+      setIsUnlocked(visible);
     };
 
     checkVisibility();
@@ -121,6 +121,7 @@ export default function TablesSection({ logs }) {
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <Award className="h-5 w-5 text-amber-400" />
             Okuma Tabloları & Sıralama
+            {!isUnlocked && <Lock className="h-4 w-4 text-amber-400 inline ml-1" />}
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             Her kullanıcı için tamamen çakışmasız, %100 eşsiz baş harf rozeti gösterilmektedir.
@@ -139,7 +140,7 @@ export default function TablesSection({ logs }) {
           >
             <Clock className="h-3.5 w-3.5" />
             Günlük Tablo
-            {!isDailyTableVisible && (
+            {!isUnlocked && (
               <Lock className="h-3 w-3 text-amber-400 ml-0.5" />
             )}
           </button>
@@ -154,6 +155,9 @@ export default function TablesSection({ logs }) {
           >
             <Flame className="h-3.5 w-3.5 text-amber-400" />
             Haftalık Özet
+            {!isUnlocked && (
+              <Lock className="h-3 w-3 text-amber-400 ml-0.5" />
+            )}
           </button>
 
           <button
@@ -166,6 +170,9 @@ export default function TablesSection({ logs }) {
           >
             <Calendar className="h-3.5 w-3.5 text-blue-400" />
             Aylık Özet
+            {!isUnlocked && (
+              <Lock className="h-3 w-3 text-amber-400 ml-0.5" />
+            )}
           </button>
         </div>
       </div>
@@ -173,7 +180,7 @@ export default function TablesSection({ logs }) {
       {/* 1. GÜNLÜK TABLO */}
       {activeTab === 'daily' && (
         <div className="space-y-4">
-          {!isDailyTableVisible ? (
+          {!isUnlocked ? (
             <div className="text-center py-12 px-4 border border-dashed border-amber-500/30 bg-slate-900/60 rounded-2xl space-y-3">
               <div className="h-12 w-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
                 <Lock className="h-6 w-6" />
@@ -245,65 +252,83 @@ export default function TablesSection({ logs }) {
       {/* 2. HAFTALIK ÖZET */}
       {activeTab === 'weekly' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Bu Haftanın En Çok Okuyanları</span>
-            <span className="font-semibold text-amber-400">
-              {weeklyLeaderboard.length} Aktif Okuyucu
-            </span>
-          </div>
-
-          {weeklyLeaderboard.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
-              <p className="text-sm font-medium text-slate-400">Bu hafta henüz okuma verisi yok.</p>
+          {!isUnlocked ? (
+            <div className="text-center py-12 px-4 border border-dashed border-amber-500/30 bg-slate-900/60 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-white">Haftalık Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Haftalık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 font-mono">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                <span>Açılış Saati: 23:30</span>
+              </div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
-                    <th className="pb-3 px-3">Derece</th>
-                    <th className="pb-3 px-3">Okuyucu Kodu</th>
-                    <th className="pb-3 px-3 text-center">Aktif Gün</th>
-                    <th className="pb-3 px-3 text-right">Haftalık Toplam</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {weeklyLeaderboard.map((item, index) => {
-                    const letter = uniqueLetterMap[item.userId] || 'A';
-                    const badgeStyle = getBadgeStyleForNickname(letter);
+            <>
+              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span>Bu Haftanın En Çok Okuyanları</span>
+                <span className="font-semibold text-amber-400">
+                  {weeklyLeaderboard.length} Aktif Okuyucu
+                </span>
+              </div>
 
-                    return (
-                      <tr key={item.userId} className="hover:bg-slate-800/40 transition">
-                        <td className="py-3.5 px-3 font-semibold text-xs">
-                          {index === 0 ? (
-                            <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">🥇 1. Sıra</span>
-                          ) : index === 1 ? (
-                            <span className="px-2 py-0.5 rounded-lg bg-slate-300/10 text-slate-300 border border-slate-300/20 font-bold">🥈 2. Sıra</span>
-                          ) : index === 2 ? (
-                            <span className="px-2 py-0.5 rounded-lg bg-amber-700/10 text-amber-600 border border-amber-700/20 font-bold">🥉 3. Sıra</span>
-                          ) : (
-                            <span className="text-slate-400">{index + 1}.</span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-3">
-                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {letter}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-center text-xs text-slate-300">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
-                            {item.daysActive} gün
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-right font-extrabold text-amber-400 text-base">
-                          {item.totalPages.toLocaleString('tr-TR')} sayfa
-                        </td>
+              {weeklyLeaderboard.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
+                  <p className="text-sm font-medium text-slate-400">Bu hafta henüz okuma verisi yok.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
+                        <th className="pb-3 px-3">Derece</th>
+                        <th className="pb-3 px-3">Okuyucu Kodu</th>
+                        <th className="pb-3 px-3 text-center">Aktif Gün</th>
+                        <th className="pb-3 px-3 text-right">Haftalık Toplam</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {weeklyLeaderboard.map((item, index) => {
+                        const letter = uniqueLetterMap[item.userId] || 'A';
+                        const badgeStyle = getBadgeStyleForNickname(letter);
+
+                        return (
+                          <tr key={item.userId} className="hover:bg-slate-800/40 transition">
+                            <td className="py-3.5 px-3 font-semibold text-xs">
+                              {index === 0 ? (
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">🥇 1. Sıra</span>
+                              ) : index === 1 ? (
+                                <span className="px-2 py-0.5 rounded-lg bg-slate-300/10 text-slate-300 border border-slate-300/20 font-bold">🥈 2. Sıra</span>
+                              ) : index === 2 ? (
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-700/10 text-amber-600 border border-amber-700/20 font-bold">🥉 3. Sıra</span>
+                              ) : (
+                                <span className="text-slate-400">{index + 1}.</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-3">
+                              <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                                {letter}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-center text-xs text-slate-300">
+                              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
+                                {item.daysActive} gün
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-right font-extrabold text-amber-400 text-base">
+                              {item.totalPages.toLocaleString('tr-TR')} sayfa
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -311,57 +336,75 @@ export default function TablesSection({ logs }) {
       {/* 3. AYLIK ÖZET */}
       {activeTab === 'monthly' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Bu Ayın Genel Okuma Sıralaması</span>
-            <span className="font-semibold text-blue-400">
-              {monthlyLeaderboard.length} Aktif Okuyucu
-            </span>
-          </div>
-
-          {monthlyLeaderboard.length === 0 ? (
-            <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
-              <p className="text-sm font-medium text-slate-400">Bu ay henüz okuma verisi yok.</p>
+          {!isUnlocked ? (
+            <div className="text-center py-12 px-4 border border-dashed border-amber-500/30 bg-slate-900/60 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-white">Aylık Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Aylık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              </p>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-300 font-mono">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                <span>Açılış Saati: 23:30</span>
+              </div>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
-                    <th className="pb-3 px-3">Sıra</th>
-                    <th className="pb-3 px-3">Okuyucu Kodu</th>
-                    <th className="pb-3 px-3 text-center">Okuma Gün Sayısı</th>
-                    <th className="pb-3 px-3 text-right">Aylık Toplam</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60">
-                  {monthlyLeaderboard.map((item, index) => {
-                    const letter = uniqueLetterMap[item.userId] || 'A';
-                    const badgeStyle = getBadgeStyleForNickname(letter);
+            <>
+              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                <span>Bu Ayın Genel Okuma Sıralaması</span>
+                <span className="font-semibold text-blue-400">
+                  {monthlyLeaderboard.length} Aktif Okuyucu
+                </span>
+              </div>
 
-                    return (
-                      <tr key={item.userId} className="hover:bg-slate-800/40 transition">
-                        <td className="py-3.5 px-3 font-semibold text-xs text-slate-400">
-                          {index + 1}.
-                        </td>
-                        <td className="py-3.5 px-3">
-                          <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
-                            {letter}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-center text-xs text-slate-300">
-                          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
-                            {item.daysActive} gün
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-right font-extrabold text-blue-400 text-base">
-                          {item.totalPages.toLocaleString('tr-TR')} sayfa
-                        </td>
+              {monthlyLeaderboard.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-slate-800 rounded-2xl">
+                  <p className="text-sm font-medium text-slate-400">Bu ay henüz okuma verisi yok.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-xs text-slate-400 uppercase tracking-wider">
+                        <th className="pb-3 px-3">Sıra</th>
+                        <th className="pb-3 px-3">Okuyucu Kodu</th>
+                        <th className="pb-3 px-3 text-center">Okuma Gün Sayısı</th>
+                        <th className="pb-3 px-3 text-right">Aylık Toplam</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {monthlyLeaderboard.map((item, index) => {
+                        const letter = uniqueLetterMap[item.userId] || 'A';
+                        const badgeStyle = getBadgeStyleForNickname(letter);
+
+                        return (
+                          <tr key={item.userId} className="hover:bg-slate-800/40 transition">
+                            <td className="py-3.5 px-3 font-semibold text-xs text-slate-400">
+                              {index + 1}.
+                            </td>
+                            <td className="py-3.5 px-3">
+                              <span className={`h-8 w-8 rounded-full inline-flex items-center justify-center font-extrabold text-sm border shadow-sm ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}>
+                                {letter}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-center text-xs text-slate-300">
+                              <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
+                                {item.daysActive} gün
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-right font-extrabold text-blue-400 text-base">
+                              {item.totalPages.toLocaleString('tr-TR')} sayfa
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
