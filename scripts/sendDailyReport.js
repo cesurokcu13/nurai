@@ -117,10 +117,10 @@ function getTurkeyDateStr(date = new Date()) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Istanbul' }).format(date);
 }
 
-function getDaysAgoTurkeyDateStr(daysAgo = 0) {
-  const d = new Date();
-  d.setDate(d.getDate() - daysAgo);
-  return getTurkeyDateStr(d);
+function getDaysAgoDateStr(baseDateStr, daysAgo = 0) {
+  const d = new Date(baseDateStr + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() - daysAgo);
+  return d.toISOString().split('T')[0];
 }
 
 function getStartOfMonthStr(dateStr) {
@@ -137,8 +137,9 @@ function getTurkishDayName(dateStr) {
 async function runDailyReport() {
   console.log('=== Risale-i Nur Okuma Halkası Günlük Raporu Hazırlanıyor ===');
 
-  const todayStr = getTurkeyDateStr();
-  const last7DaysStr = getDaysAgoTurkeyDateStr(6);
+  const targetDateArg = process.argv[2] || process.env.TARGET_DATE;
+  const todayStr = targetDateArg || getTurkeyDateStr();
+  const last7DaysStr = getDaysAgoDateStr(todayStr, 6);
   const startOfMonthStr = getStartOfMonthStr(todayStr);
 
   const dayOfMonth = parseInt(todayStr.split('-')[2], 10);
@@ -173,21 +174,23 @@ async function runDailyReport() {
     process.exit(1);
   }
 
-  // 3. Fetch weekly logs (last 7 days inclusive)
+  // 3. Fetch weekly logs (last 7 days inclusive up to todayStr)
   const { data: weeklyLogs, error: weeklyErr } = await supabase
     .from('reading_logs')
     .select('id, user_id, log_date, page_count')
-    .gte('log_date', last7DaysStr);
+    .gte('log_date', last7DaysStr)
+    .lte('log_date', todayStr);
 
   if (weeklyErr) {
     console.error('Haftalık okuma kayıtları çekilirken hata:', weeklyErr);
   }
 
-  // 4. Fetch monthly logs (from 1st day of current month)
+  // 4. Fetch monthly logs (from 1st day of current month up to todayStr)
   const { data: monthlyLogs, error: monthlyErr } = await supabase
     .from('reading_logs')
     .select('id, user_id, log_date, page_count')
-    .gte('log_date', startOfMonthStr);
+    .gte('log_date', startOfMonthStr)
+    .lte('log_date', todayStr);
 
   if (monthlyErr) {
     console.error('Aylık okuma kayıtları çekilirken hata:', monthlyErr);
@@ -254,7 +257,7 @@ async function runDailyReport() {
   // --- LAST 7 DAYS TREND CHART DATA ---
   const last7DaysArray = [];
   for (let i = 6; i >= 0; i--) {
-    const dStr = getDaysAgoTurkeyDateStr(i);
+    const dStr = getDaysAgoDateStr(todayStr, i);
     const dayName = getTurkishDayName(dStr);
     const dayDisplay = `${parseInt(dStr.split('-')[2], 10)}/${parseInt(dStr.split('-')[1], 10)} ${dayName}`;
     last7DaysArray.push({
@@ -600,8 +603,10 @@ async function runDailyReport() {
       fs.mkdirSync(previewDir, { recursive: true });
     }
     const previewPath = path.join(previewDir, 'preview-daily-report.html');
+    const datedPreviewPath = path.join(previewDir, `preview-daily-report-${todayStr}.html`);
     fs.writeFileSync(previewPath, htmlContent, 'utf8');
-    console.log(`HTML Önizleme Dosyası Oluşturuldu: ${previewPath}`);
+    fs.writeFileSync(datedPreviewPath, htmlContent, 'utf8');
+    console.log(`HTML Önizleme Dosyası Oluşturuldu: ${datedPreviewPath}`);
   } catch (err) {
     console.warn('Önizleme dosyası yazılırken uyarı:', err.message);
   }
