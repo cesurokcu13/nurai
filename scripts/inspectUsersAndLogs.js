@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import { createClient } from '@supabase/supabase-js';
+import WebSocket from 'ws';
+
+globalThis.WebSocket ??= WebSocket;
+const { createClient } = await import('@supabase/supabase-js');
 
 // Auto-load .env file if present
 try {
