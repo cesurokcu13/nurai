@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "report": "node scripts/sendDailyReport.js"
   },
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.48.1",
     "canvas-confetti": "^1.9.4",
