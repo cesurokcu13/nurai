@@ -89,36 +89,36 @@ export default function VecizeCard() {
   const currentVecize = VECIZELER[currentIndex];
 
   return (
-    <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-xl relative overflow-hidden my-8">
-      {/* Ambient background glow */}
-      <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="paper-card rounded-3xl p-6 sm:p-8 border border-stone-200/90 shadow-sm relative overflow-hidden my-6 bg-[#FCFBF9]">
+      {/* Ambient background soft glow */}
+      <div className="absolute -left-10 -bottom-10 w-48 h-48 bg-amber-100/40 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800/80">
+      <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-stone-200/80">
         <div className="flex items-center gap-2">
-          <Quote className="h-5 w-5 text-amber-400" />
-          <h3 className="text-sm font-bold text-white tracking-wide">
+          <Quote className="h-5 w-5 text-amber-700" />
+          <h3 className="text-sm font-bold font-serif text-stone-900 tracking-wide">
             Günün Risale-i Nur Vecizesi
           </h3>
         </div>
 
         <button
           onClick={handleNextVecize}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold border border-amber-500/20 transition active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold border border-amber-200 shadow-2xs transition active:scale-95"
           title="Farklı bir vecize getir"
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw className="h-3.5 w-3.5 text-amber-700" />
           Farklı Vecize
         </button>
       </div>
 
       {/* Vecize Text Box */}
       <div className={`transition-opacity duration-300 ${fade ? 'opacity-100' : 'opacity-0'}`}>
-        <blockquote className="text-base sm:text-lg text-slate-200 font-serif italic leading-relaxed mb-4">
+        <blockquote className="text-base sm:text-lg text-stone-800 font-serif italic leading-relaxed mb-4">
           &ldquo;{currentVecize.text}&rdquo;
         </blockquote>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <span className="font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-xl self-start">
+          <span className="font-semibold text-amber-900 bg-amber-100/80 border border-amber-300 px-3 py-1 rounded-xl self-start shadow-2xs">
             — {currentVecize.source}
           </span>
 
@@ -126,7 +126,7 @@ export default function VecizeCard() {
             href="https://sorularlarisale.com/kaynaklar/muhtelif-calismalar/risale-i-nurdan-vecizeler"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-emerald-400 inline-flex items-center gap-1 transition font-medium underline-offset-4 hover:underline"
+            className="text-stone-500 hover:text-sage-700 inline-flex items-center gap-1 transition font-medium underline-offset-4 hover:underline"
           >
             Kaynak: Sorularla Risale
             <ExternalLink className="h-3 w-3" />
