@@ -52,36 +52,36 @@ export default function StatsCharts({ logs }) {
   }, [logs]);
 
   return (
-    <div className="paper-card rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-sm">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-200/80">
+    <div className="paper-card dark:border-slate-800 rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-sm">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-200/80 dark:border-slate-800">
         <div>
-          <h3 className="text-lg font-bold font-serif text-stone-900 flex items-center gap-2.5">
-            <span className="p-1.5 rounded-xl bg-sage-50 text-sage-700 border border-sage-200/80">
+          <h3 className="text-lg font-bold font-serif text-stone-900 dark:text-white flex items-center gap-2.5">
+            <span className="p-1.5 rounded-xl bg-sage-50 dark:bg-emerald-500/10 text-sage-700 dark:text-emerald-400 border border-sage-200/80 dark:border-emerald-500/20">
               <TrendingUp className="h-4.5 w-4.5" />
             </span>
             Son 14 Günün Okuma Eğilimi
-            {!isUnlocked && <Lock className="h-4 w-4 text-amber-600 inline ml-1" />}
+            {!isUnlocked && <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400 inline ml-1" />}
           </h3>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">
             Halka genelinde günlük okunan toplam sayfa sayıları grafiği
           </p>
         </div>
-        <div className="p-2.5 rounded-xl bg-stone-100 text-stone-700 border border-stone-200/80 shadow-2xs">
+        <div className="p-2.5 rounded-xl bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 border border-stone-200/80 dark:border-slate-700 shadow-2xs">
           <BarChart2 className="h-5 w-5" />
         </div>
       </div>
 
       {!isUnlocked ? (
-        <div className="text-center py-14 px-4 border border-dashed border-amber-300 bg-[#FAF8F5] rounded-2xl space-y-3">
-          <div className="h-12 w-12 rounded-2xl bg-amber-100 text-amber-800 border border-amber-200 flex items-center justify-center mx-auto shadow-2xs">
+        <div className="text-center py-14 px-4 border border-dashed border-amber-300 dark:border-amber-500/30 bg-[#FAF8F5] dark:bg-amber-950/20 rounded-2xl space-y-3">
+          <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center mx-auto shadow-2xs">
             <Lock className="h-6 w-6" />
           </div>
-          <h4 className="text-base font-bold font-serif text-stone-900">Okuma Grafik Verileri Kilitlidir</h4>
-          <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-            Günlük toplam okunan sayfa eğilim grafiği veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+          <h4 className="text-base font-bold font-serif text-stone-900 dark:text-white">Okuma Grafik Verileri Kilitlidir</h4>
+          <p className="text-xs text-stone-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+            Günlük toplam okunan sayfa eğilim grafiği veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 dark:text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
           </p>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 font-mono shadow-2xs">
-            <Clock className="h-3.5 w-3.5 text-amber-700" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs text-stone-700 dark:text-slate-300 font-mono shadow-2xs">
+            <Clock className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
             <span>Açılış Saati: 23:30</span>
           </div>
         </div>

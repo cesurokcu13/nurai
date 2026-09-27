@@ -7,14 +7,26 @@
     font-family: 'Plus Jakarta Sans', sans-serif;
     background-color: #FAF8F5;
     color: #292524;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .dark body {
+    background-color: #020617;
+    color: #f1f5f9;
   }
 }
 
-/* Warm Paper & Editorial Minimalist Utilities */
-.glass-panel {
+/* Warm Paper & Editorial Minimalist Utilities + Dark Mode */
+.glass-panel, .paper-card {
   background: #FFFFFF;
   border: 1px solid #E7E5E4;
   box-shadow: 0 1px 3px 0 rgba(41, 37, 36, 0.04), 0 1px 2px -1px rgba(41, 37, 36, 0.04);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .glass-panel, .dark .paper-card {
+  background: #0f172a;
+  border-color: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
 .glass-card {
@@ -29,13 +41,16 @@
   box-shadow: 0 4px 6px -1px rgba(41, 37, 36, 0.06);
 }
 
-.paper-card {
-  background: #FFFFFF;
-  border: 1px solid #E7E5E4;
-  box-shadow: 0 2px 5px -1px rgba(41, 37, 36, 0.05);
+.dark .glass-card {
+  background: #0f172a;
+  border-color: #1e293b;
 }
 
-/* Warm light scrollbar */
+.dark .glass-card:hover {
+  border-color: #334155;
+}
+
+/* Scrollbar (Light & Dark) */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
@@ -43,10 +58,19 @@
 ::-webkit-scrollbar-track {
   background: #FAF8F5;
 }
+.dark ::-webkit-scrollbar-track {
+  background: #020617;
+}
 ::-webkit-scrollbar-thumb {
   background: #D6D3D1;
   border-radius: 4px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #A8A29E;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }

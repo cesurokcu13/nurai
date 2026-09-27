@@ -113,31 +113,31 @@ export default function TablesSection({ logs }) {
   }, [logs]);
 
   return (
-    <div className="paper-card rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-sm space-y-6">
+    <div className="paper-card dark:border-slate-800 rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-sm space-y-6">
       
       {/* Header & Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200/80 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-200/80 dark:border-slate-800 pb-5">
         <div>
-          <h2 className="text-xl font-bold font-serif text-stone-900 flex items-center gap-2.5">
-            <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/80">
+          <h2 className="text-xl font-bold font-serif text-stone-900 dark:text-white flex items-center gap-2.5">
+            <span className="p-1.5 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-500/20">
               <Award className="h-4.5 w-4.5" />
             </span>
             Okuma Tabloları & Sıralama
-            {!isUnlocked && <Lock className="h-4 w-4 text-amber-600 inline ml-1" />}
+            {!isUnlocked && <Lock className="h-4 w-4 text-amber-600 dark:text-amber-400 inline ml-1" />}
           </h2>
-          <p className="text-xs text-stone-500 mt-1">
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">
             Her okuyucu için tamamen gizli ve çakışmasız, %100 eşsiz baş harf rozeti gösterilmektedir.
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 border border-stone-200/80 self-start sm:self-auto shadow-2xs">
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-stone-100 dark:bg-slate-950 border border-stone-200/80 dark:border-slate-800 self-start sm:self-auto shadow-2xs">
           <button
             onClick={() => setActiveTab('daily')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
               activeTab === 'daily'
-                ? 'bg-sage-700 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-white/80'
+                ? 'bg-sage-700 dark:bg-emerald-600 text-white shadow-xs'
+                : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800'
             }`}
           >
             <Clock className="h-3.5 w-3.5" />
@@ -151,8 +151,8 @@ export default function TablesSection({ logs }) {
             onClick={() => setActiveTab('weekly')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
               activeTab === 'weekly'
-                ? 'bg-sage-700 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-white/80'
+                ? 'bg-sage-700 dark:bg-emerald-600 text-white shadow-xs'
+                : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800'
             }`}
           >
             <Flame className="h-3.5 w-3.5 text-amber-500" />
@@ -166,11 +166,11 @@ export default function TablesSection({ logs }) {
             onClick={() => setActiveTab('monthly')}
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 ${
               activeTab === 'monthly'
-                ? 'bg-sage-700 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-white/80'
+                ? 'bg-sage-700 dark:bg-emerald-600 text-white shadow-xs'
+                : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-800'
             }`}
           >
-            <Calendar className="h-3.5 w-3.5 text-sky-600" />
+            <Calendar className="h-3.5 w-3.5 text-sky-600 dark:text-blue-400" />
             Aylık Özet
             {!isUnlocked && (
               <Lock className="h-3 w-3 text-amber-400 ml-0.5" />
@@ -183,52 +183,52 @@ export default function TablesSection({ logs }) {
       {activeTab === 'daily' && (
         <div className="space-y-4">
           {!isUnlocked ? (
-            <div className="text-center py-12 px-4 border border-dashed border-amber-300 bg-[#FAF8F5] rounded-2xl space-y-3">
-              <div className="h-12 w-12 rounded-2xl bg-amber-100 text-amber-800 border border-amber-200 flex items-center justify-center mx-auto shadow-2xs">
+            <div className="text-center py-12 px-4 border border-dashed border-amber-300 dark:border-amber-500/30 bg-[#FAF8F5] dark:bg-amber-950/20 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center mx-auto shadow-2xs">
                 <Lock className="h-6 w-6" />
               </div>
-              <h3 className="text-base font-bold font-serif text-stone-900">Günlük Sıralama Tablosu Kilitlidir</h3>
-              <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-                Günlük okuma sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              <h3 className="text-base font-bold font-serif text-stone-900 dark:text-white">Günlük Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-stone-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+                Günlük okuma sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 dark:text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
               </p>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 font-mono shadow-2xs">
-                <Clock className="h-3.5 w-3.5 text-amber-700" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs text-stone-700 dark:text-slate-300 font-mono shadow-2xs">
+                <Clock className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
                 <span>Açılış Saati: 23:30</span>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+              <div className="flex items-center justify-between text-xs text-stone-500 dark:text-slate-400 px-1">
                 <span>Bugünün Kayıtları ({todayStr})</span>
-                <span className="font-semibold text-sage-800">
+                <span className="font-semibold text-sage-800 dark:text-emerald-400">
                   Toplam: {todayLogs.reduce((acc, curr) => acc + curr.page_count, 0)} Sayfa
                 </span>
               </div>
 
               {todayLogs.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-stone-200 bg-[#FAF8F5] rounded-2xl">
-                  <BookOpen className="h-10 w-10 text-stone-400 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-stone-700">Bugün henüz okuma kaydı girilmedi.</p>
-                  <p className="text-xs text-stone-500 mt-1">Yukarıdaki formdan ilk kaydı siz oluşturun!</p>
+                <div className="text-center py-12 border border-dashed border-stone-200 dark:border-slate-800 bg-[#FAF8F5] dark:bg-slate-900/40 rounded-2xl">
+                  <BookOpen className="h-10 w-10 text-stone-400 dark:text-slate-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-stone-700 dark:text-slate-300">Bugün henüz okuma kaydı girilmedi.</p>
+                  <p className="text-xs text-stone-500 dark:text-slate-400 mt-1">Yukarıdaki formdan ilk kaydı siz oluşturun!</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-stone-200/80">
+                <div className="overflow-x-auto rounded-xl border border-stone-200/80 dark:border-slate-800">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-stone-50/80">
-                      <tr className="border-b border-stone-200 text-xs text-stone-600 uppercase tracking-wider font-semibold">
+                    <thead className="bg-stone-50/80 dark:bg-slate-900">
+                      <tr className="border-b border-stone-200 dark:border-slate-800 text-xs text-stone-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         <th className="py-3 px-3.5">Sıra</th>
                         <th className="py-3 px-3.5">Okuyucu Kodu</th>
                         <th className="py-3 px-3.5 text-right">Sayfa Sayısı</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-stone-100 bg-white">
+                    <tbody className="divide-y divide-stone-100 dark:divide-slate-800/80 bg-white dark:bg-slate-950">
                       {todayLogs.map((log, index) => {
                         const letter = uniqueLetterMap[log.user_id] || 'A';
                         const badgeStyle = getBadgeStyleForNickname(letter);
 
                         return (
-                          <tr key={log.id} className="hover:bg-stone-50/80 transition">
-                            <td className="py-3 px-3.5 font-semibold text-stone-600 text-xs">
+                          <tr key={log.id} className="hover:bg-stone-50/80 dark:hover:bg-slate-900/60 transition">
+                            <td className="py-3 px-3.5 font-semibold text-stone-600 dark:text-slate-400 text-xs">
                               {index === 0 ? '🥇 1.' : index === 1 ? '🥈 2.' : index === 2 ? '🥉 3.' : `${index + 1}.`}
                             </td>
                             <td className="py-3 px-3.5">
@@ -236,7 +236,7 @@ export default function TablesSection({ logs }) {
                                 {letter}
                               </span>
                             </td>
-                            <td className="py-3 px-3.5 text-right font-serif font-bold text-sage-800 text-base">
+                            <td className="py-3 px-3.5 text-right font-serif font-bold text-sage-800 dark:text-emerald-400 text-base">
                               {log.page_count} sayfa
                             </td>
                           </tr>
@@ -255,59 +255,59 @@ export default function TablesSection({ logs }) {
       {activeTab === 'weekly' && (
         <div className="space-y-4">
           {!isUnlocked ? (
-            <div className="text-center py-12 px-4 border border-dashed border-amber-300 bg-[#FAF8F5] rounded-2xl space-y-3">
-              <div className="h-12 w-12 rounded-2xl bg-amber-100 text-amber-800 border border-amber-200 flex items-center justify-center mx-auto shadow-2xs">
+            <div className="text-center py-12 px-4 border border-dashed border-amber-300 dark:border-amber-500/30 bg-[#FAF8F5] dark:bg-amber-950/20 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center mx-auto shadow-2xs">
                 <Lock className="h-6 w-6" />
               </div>
-              <h3 className="text-base font-bold font-serif text-stone-900">Haftalık Sıralama Tablosu Kilitlidir</h3>
-              <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-                Haftalık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              <h3 className="text-base font-bold font-serif text-stone-900 dark:text-white">Haftalık Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-stone-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+                Haftalık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 dark:text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
               </p>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 font-mono shadow-2xs">
-                <Clock className="h-3.5 w-3.5 text-amber-700" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs text-stone-700 dark:text-slate-300 font-mono shadow-2xs">
+                <Clock className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
                 <span>Açılış Saati: 23:30</span>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+              <div className="flex items-center justify-between text-xs text-stone-500 dark:text-slate-400 px-1">
                 <span>Bu Haftanın En Çok Okuyanları</span>
-                <span className="font-semibold text-amber-800">
+                <span className="font-semibold text-amber-800 dark:text-amber-400">
                   {weeklyLeaderboard.length} Aktif Okuyucu
                 </span>
               </div>
 
               {weeklyLeaderboard.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-stone-200 bg-[#FAF8F5] rounded-2xl">
-                  <p className="text-sm font-medium text-stone-600">Bu hafta henüz okuma verisi yok.</p>
+                <div className="text-center py-12 border border-dashed border-stone-200 dark:border-slate-800 bg-[#FAF8F5] dark:bg-slate-900/40 rounded-2xl">
+                  <p className="text-sm font-medium text-stone-600 dark:text-slate-400">Bu hafta henüz okuma verisi yok.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-stone-200/80">
+                <div className="overflow-x-auto rounded-xl border border-stone-200/80 dark:border-slate-800">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-stone-50/80">
-                      <tr className="border-b border-stone-200 text-xs text-stone-600 uppercase tracking-wider font-semibold">
+                    <thead className="bg-stone-50/80 dark:bg-slate-900">
+                      <tr className="border-b border-stone-200 dark:border-slate-800 text-xs text-stone-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         <th className="py-3 px-3.5">Derece</th>
                         <th className="py-3 px-3.5">Okuyucu Kodu</th>
                         <th className="py-3 px-3.5 text-center">Aktif Gün</th>
                         <th className="py-3 px-3.5 text-right">Haftalık Toplam</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-stone-100 bg-white">
+                    <tbody className="divide-y divide-stone-100 dark:divide-slate-800/80 bg-white dark:bg-slate-950">
                       {weeklyLeaderboard.map((item, index) => {
                         const letter = uniqueLetterMap[item.userId] || 'A';
                         const badgeStyle = getBadgeStyleForNickname(letter);
 
                         return (
-                          <tr key={item.userId} className="hover:bg-stone-50/80 transition">
+                          <tr key={item.userId} className="hover:bg-stone-50/80 dark:hover:bg-slate-900/60 transition">
                             <td className="py-3 px-3.5 font-semibold text-xs">
                               {index === 0 ? (
-                                <span className="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-bold">🥇 1. Sıra</span>
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 font-bold">🥇 1. Sıra</span>
                               ) : index === 1 ? (
-                                <span className="px-2 py-0.5 rounded-lg bg-stone-100 text-stone-700 border border-stone-200 font-bold">🥈 2. Sıra</span>
+                                <span className="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 border border-stone-200 dark:border-slate-700 font-bold">🥈 2. Sıra</span>
                               ) : index === 2 ? (
-                                <span className="px-2 py-0.5 rounded-lg bg-amber-100/50 text-amber-900 border border-amber-200 font-bold">🥉 3. Sıra</span>
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-100/50 dark:bg-amber-500/10 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20 font-bold">🥉 3. Sıra</span>
                               ) : (
-                                <span className="text-stone-500">{index + 1}.</span>
+                                <span className="text-stone-500 dark:text-slate-500">{index + 1}.</span>
                               )}
                             </td>
                             <td className="py-3 px-3.5">
@@ -315,12 +315,12 @@ export default function TablesSection({ logs }) {
                                 {letter}
                               </span>
                             </td>
-                            <td className="py-3 px-3.5 text-center text-xs text-stone-600">
-                              <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold border border-stone-200/60">
+                            <td className="py-3 px-3.5 text-center text-xs text-stone-600 dark:text-slate-400">
+                              <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 font-semibold border border-stone-200/60 dark:border-slate-700">
                                 {item.daysActive} gün
                               </span>
                             </td>
-                            <td className="py-3 px-3.5 text-right font-serif font-bold text-stone-900 text-base">
+                            <td className="py-3 px-3.5 text-right font-serif font-bold text-stone-900 dark:text-white text-base">
                               {item.totalPages.toLocaleString('tr-TR')} sayfa
                             </td>
                           </tr>
@@ -339,51 +339,51 @@ export default function TablesSection({ logs }) {
       {activeTab === 'monthly' && (
         <div className="space-y-4">
           {!isUnlocked ? (
-            <div className="text-center py-12 px-4 border border-dashed border-amber-300 bg-[#FAF8F5] rounded-2xl space-y-3">
-              <div className="h-12 w-12 rounded-2xl bg-amber-100 text-amber-800 border border-amber-200 flex items-center justify-center mx-auto shadow-2xs">
+            <div className="text-center py-12 px-4 border border-dashed border-amber-300 dark:border-amber-500/30 bg-[#FAF8F5] dark:bg-amber-950/20 rounded-2xl space-y-3">
+              <div className="h-12 w-12 rounded-2xl bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center mx-auto shadow-2xs">
                 <Lock className="h-6 w-6" />
               </div>
-              <h3 className="text-base font-bold font-serif text-stone-900">Aylık Sıralama Tablosu Kilitlidir</h3>
-              <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-                Aylık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
+              <h3 className="text-base font-bold font-serif text-stone-900 dark:text-white">Aylık Sıralama Tablosu Kilitlidir</h3>
+              <p className="text-xs text-stone-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+                Aylık okuma özeti ve sıralaması veri girişleri tamamlandıktan sonra her gece <span className="text-amber-800 dark:text-amber-400 font-semibold">23:30 - 00:00</span> saatleri arasında erişime açılacaktır.
               </p>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-stone-200 text-xs text-stone-700 font-mono shadow-2xs">
-                <Clock className="h-3.5 w-3.5 text-amber-700" />
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 text-xs text-stone-700 dark:text-slate-300 font-mono shadow-2xs">
+                <Clock className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
                 <span>Açılış Saati: 23:30</span>
               </div>
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+              <div className="flex items-center justify-between text-xs text-stone-500 dark:text-slate-400 px-1">
                 <span>Bu Ayın Genel Okuma Sıralaması</span>
-                <span className="font-semibold text-sky-800">
+                <span className="font-semibold text-sky-800 dark:text-sky-400">
                   {monthlyLeaderboard.length} Aktif Okuyucu
                 </span>
               </div>
 
               {monthlyLeaderboard.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-stone-200 bg-[#FAF8F5] rounded-2xl">
-                  <p className="text-sm font-medium text-stone-600">Bu ay henüz okuma verisi yok.</p>
+                <div className="text-center py-12 border border-dashed border-stone-200 dark:border-slate-800 bg-[#FAF8F5] dark:bg-slate-900/40 rounded-2xl">
+                  <p className="text-sm font-medium text-stone-600 dark:text-slate-400">Bu ay henüz okuma verisi yok.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-stone-200/80">
+                <div className="overflow-x-auto rounded-xl border border-stone-200/80 dark:border-slate-800">
                   <table className="w-full text-left text-sm">
-                    <thead className="bg-stone-50/80">
-                      <tr className="border-b border-stone-200 text-xs text-stone-600 uppercase tracking-wider font-semibold">
+                    <thead className="bg-stone-50/80 dark:bg-slate-900">
+                      <tr className="border-b border-stone-200 dark:border-slate-800 text-xs text-stone-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                         <th className="py-3 px-3.5">Sıra</th>
                         <th className="py-3 px-3.5">Okuyucu Kodu</th>
                         <th className="py-3 px-3.5 text-center">Okuma Gün Sayısı</th>
                         <th className="py-3 px-3.5 text-right">Aylık Toplam</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-stone-100 bg-white">
+                    <tbody className="divide-y divide-stone-100 dark:divide-slate-800/80 bg-white dark:bg-slate-950">
                       {monthlyLeaderboard.map((item, index) => {
                         const letter = uniqueLetterMap[item.userId] || 'A';
                         const badgeStyle = getBadgeStyleForNickname(letter);
 
                         return (
-                          <tr key={item.userId} className="hover:bg-stone-50/80 transition">
-                            <td className="py-3 px-3.5 font-semibold text-xs text-stone-600">
+                          <tr key={item.userId} className="hover:bg-stone-50/80 dark:hover:bg-slate-900/60 transition">
+                            <td className="py-3 px-3.5 font-semibold text-xs text-stone-600 dark:text-slate-400">
                               {index + 1}.
                             </td>
                             <td className="py-3 px-3.5">
@@ -391,12 +391,12 @@ export default function TablesSection({ logs }) {
                                 {letter}
                               </span>
                             </td>
-                            <td className="py-3 px-3.5 text-center text-xs text-stone-600">
-                              <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold border border-stone-200/60">
+                            <td className="py-3 px-3.5 text-center text-xs text-stone-600 dark:text-slate-400">
+                              <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-slate-800 text-stone-700 dark:text-slate-300 font-semibold border border-stone-200/60 dark:border-slate-700">
                                 {item.daysActive} gün
                               </span>
                             </td>
-                            <td className="py-3 px-3.5 text-right font-serif font-bold text-stone-900 text-base">
+                            <td className="py-3 px-3.5 text-right font-serif font-bold text-stone-900 dark:text-white text-base">
                               {item.totalPages.toLocaleString('tr-TR')} sayfa
                             </td>
                           </tr>
@@ -412,9 +412,9 @@ export default function TablesSection({ logs }) {
       )}
 
       {/* Privacy note bottom bar */}
-      <div className="pt-4 border-t border-stone-200/80 flex items-center justify-between text-xs text-stone-500">
+      <div className="pt-4 border-t border-stone-200/80 dark:border-slate-800 flex items-center justify-between text-xs text-stone-500 dark:text-slate-400">
         <span className="flex items-center gap-1.5">
-          <ShieldCheck className="h-3.5 w-3.5 text-sage-700" />
+          <ShieldCheck className="h-3.5 w-3.5 text-sage-700 dark:text-emerald-400" />
           Kullanıcı isimleri gizlidir. Her okuyucu için %100 eşsiz ve çakışmasız tek bir baş harf gösterilmektedir.
         </span>
       </div>

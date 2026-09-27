@@ -15,6 +15,25 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Theme State: 'light' | 'dark' (defaults to light, persists in localStorage)
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
   // Initial Load: User session & all reading logs from Supabase
   const loadData = useCallback(async () => {
     try {
@@ -90,7 +109,7 @@ export default function App() {
   }, [logs]);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-stone-800 flex flex-col selection:bg-sage-600 selection:text-white font-sans">
+    <div className="min-h-screen bg-[#FAF8F5] dark:bg-slate-950 text-stone-800 dark:text-slate-100 flex flex-col selection:bg-sage-600 selection:text-white font-sans transition-colors duration-200">
       
       {/* Top Header */}
       <Header
@@ -98,6 +117,8 @@ export default function App() {
         onOpenAuth={() => setAuthModalOpen(true)}
         onSignOut={handleSignOut}
         stats={globalStats}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Content Area */}
@@ -105,20 +126,20 @@ export default function App() {
         
         {/* Supabase Connection Status Banner */}
         {isSupabaseConfigured ? (
-          <div className="p-3.5 rounded-2xl bg-sage-50 border border-sage-200/90 flex items-center justify-between gap-3 text-xs text-sage-900 shadow-2xs">
+          <div className="p-3.5 rounded-2xl bg-sage-50 dark:bg-emerald-500/10 border border-sage-200/90 dark:border-emerald-500/30 flex items-center justify-between gap-3 text-xs text-sage-900 dark:text-emerald-400 shadow-2xs">
             <div className="flex items-center gap-2 font-medium">
-              <Database className="h-4 w-4 text-sage-700" />
+              <Database className="h-4 w-4 text-sage-700 dark:text-emerald-400" />
               <span>🟢 Supabase Canlı Veritabanı Bağlantısı Aktif</span>
             </div>
-            <span className="flex items-center gap-1 text-[11px] text-sage-800 bg-white px-2.5 py-1 rounded-lg border border-sage-200 shadow-2xs">
-              <ShieldCheck className="h-3.5 w-3.5 text-sage-700" /> %100 Anonim Veri Güvenliği
+            <span className="flex items-center gap-1 text-[11px] text-sage-800 dark:text-emerald-400 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-sage-200 dark:border-emerald-500/20 shadow-2xs">
+              <ShieldCheck className="h-3.5 w-3.5 text-sage-700 dark:text-emerald-400" /> %100 Anonim Veri Güvenliği
             </span>
           </div>
         ) : (
-          <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start sm:items-center gap-3 text-xs text-amber-900 shadow-2xs">
-            <AlertCircle className="h-5 w-5 text-amber-700 shrink-0 mt-0.5 sm:mt-0" />
+          <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-start sm:items-center gap-3 text-xs text-amber-900 dark:text-amber-300 shadow-2xs">
+            <AlertCircle className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
             <div className="flex-1">
-              <span className="font-semibold text-amber-950">Supabase Bağlantı Uyarısı:</span> Canlı veritabanı bağlantısı için GitHub Repository ayarlarınızdan <code className="bg-amber-100/80 border border-amber-200 px-1.5 py-0.5 rounded text-amber-950 font-mono">Settings -&gt; Secrets -&gt; Actions</code> kısmına <code className="bg-amber-100/80 border border-amber-200 px-1.5 py-0.5 rounded text-amber-950 font-mono">VITE_SUPABASE_URL</code> ve <code className="bg-amber-100/80 border border-amber-200 px-1.5 py-0.5 rounded text-amber-950 font-mono">VITE_SUPABASE_ANON_KEY</code> ekleyiniz.
+              <span className="font-semibold text-amber-950 dark:text-amber-400">Supabase Bağlantı Uyarısı:</span> Canlı veritabanı bağlantısı için GitHub Repository ayarlarınızdan <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">Settings -&gt; Secrets -&gt; Actions</code> kısmına <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_URL</code> ve <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_ANON_KEY</code> ekleyiniz.
             </div>
           </div>
         )}
