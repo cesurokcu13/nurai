@@ -7,7 +7,7 @@ import PersonalProfile from './components/PersonalProfile';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import { apiService, isSupabaseConfigured } from './lib/supabase';
-import { Database, ShieldCheck, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 export default function App() {
   const [userProfile, setUserProfile] = useState(null);
@@ -124,18 +124,8 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-7">
         
-        {/* Supabase Connection Status Banner */}
-        {isSupabaseConfigured ? (
-          <div className="p-3.5 rounded-2xl bg-sage-50 dark:bg-emerald-500/10 border border-sage-200/90 dark:border-emerald-500/30 flex items-center justify-between gap-3 text-xs text-sage-900 dark:text-emerald-400 shadow-2xs">
-            <div className="flex items-center gap-2 font-medium">
-              <Database className="h-4 w-4 text-sage-700 dark:text-emerald-400" />
-              <span>🟢 Supabase Canlı Veritabanı Bağlantısı Aktif</span>
-            </div>
-            <span className="flex items-center gap-1 text-[11px] text-sage-800 dark:text-emerald-400 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-sage-200 dark:border-emerald-500/20 shadow-2xs">
-              <ShieldCheck className="h-3.5 w-3.5 text-sage-700 dark:text-emerald-400" /> %100 Anonim Veri Güvenliği
-            </span>
-          </div>
-        ) : (
+        {/* Supabase Connection Warning (only shown if not configured) */}
+        {!isSupabaseConfigured && (
           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-start sm:items-center gap-3 text-xs text-amber-900 dark:text-amber-300 shadow-2xs">
             <AlertCircle className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
             <div className="flex-1">
