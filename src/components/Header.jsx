@@ -70,7 +70,7 @@ export default function Header({
                     </span>
                   </div>
                   <p className="text-xs text-stone-500 dark:text-slate-400">
-                    Birlikte Okuyoruz — Günlük Takip & Ortak Vazifeler
+                    Birlikte Okuyoruz — Günlük Takip & Vazife Dağılımı
                   </p>
                 </div>
               </div>
