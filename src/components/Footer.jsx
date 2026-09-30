@@ -22,20 +22,12 @@ export default function Footer() {
               <ShieldCheck className="h-3.5 w-3.5 text-sage-700 dark:text-emerald-400" /> %100 Anonim & Güvenli
             </span>
             <span>•</span>
-            <a
-              href="https://sorularlarisale.com/kaynaklar/muhtelif-calismalar/risale-i-nurdan-vecizeler"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-sage-800 dark:hover:text-emerald-400 transition flex items-center gap-1 text-stone-500 dark:text-slate-400"
-            >
-              Kaynak: Sorularla Risale Vecizeler
-              <ExternalLink className="h-3 w-3" />
-            </a>
+           
           </div>
         </div>
 
         <p className="text-center text-[11px] text-stone-400 dark:text-slate-600">
-          Birlikte okuma şevkini ve meşvereti artırmak için tasarlanmıştır.
+          Birlikte okuma iştiyakını artırmak için tasarlanmıştır.
         </p>
 
       </div>
