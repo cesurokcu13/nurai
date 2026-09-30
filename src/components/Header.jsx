@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock, Lock, Sun, Moon } from 'lucide-react';
+import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock, Lock, Sun, Moon, ClipboardList, Crown } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
-export default function Header({ userProfile, onOpenAuth, onSignOut, stats, theme = 'light', onToggleTheme }) {
+export default function Header({ 
+  userProfile, 
+  onOpenAuth, 
+  onSignOut, 
+  stats, 
+  theme = 'light', 
+  onToggleTheme,
+  activeTab = 'reading',
+  onSelectTab
+}) {
   const badgeStyle = userProfile ? getBadgeStyleForNickname(userProfile.color_nickname) : null;
+  const isAdmin = userProfile?.role === 'admin';
 
   // Countdown timer for 23:30 Deadline
   const [countdownText, setCountdownText] = useState('00:00:00');
@@ -41,31 +51,62 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats, them
         {/* Top ambient line */}
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-stone-300 via-sage-600 to-amber-500 dark:from-emerald-500 dark:via-teal-400 dark:to-cyan-500"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
             
-            {/* Logo & Title */}
-            <div className="flex items-center gap-3">
-              <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-sage-700 dark:bg-gradient-to-tr dark:from-emerald-600 dark:to-teal-500 flex items-center justify-center shadow-sm text-white shrink-0">
-                <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-bold font-serif text-stone-900 dark:text-white tracking-tight">
-                    Risale-i Nur Okuma Halkası
-                  </h1>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sage-50 dark:bg-emerald-500/10 text-sage-800 dark:text-emerald-400 border border-sage-200 dark:border-emerald-500/20">
-                    <ShieldCheck className="h-3 w-3" /> Anonim
-                  </span>
+            {/* Logo, Title & Main Tab Switcher */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+              <div className="flex items-center gap-3">
+                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-sage-700 dark:bg-gradient-to-tr dark:from-emerald-600 dark:to-teal-500 flex items-center justify-center shadow-sm text-white shrink-0">
+                  <BookOpen className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <p className="text-xs sm:text-sm text-stone-500 dark:text-slate-400">
-                  Birlikte Okuyoruz — Günlük, Haftalık ve Aylık Takip
-                </p>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-lg sm:text-xl font-bold font-serif text-stone-900 dark:text-white tracking-tight">
+                      Risale-i Nur Okuma Halkası
+                    </h1>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sage-50 dark:bg-emerald-500/10 text-sage-800 dark:text-emerald-400 border border-sage-200 dark:border-emerald-500/20">
+                      <ShieldCheck className="h-3 w-3" /> Anonim
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-500 dark:text-slate-400">
+                    Birlikte Okuyoruz — Günlük Takip & Ortak Vazifeler
+                  </p>
+                </div>
               </div>
+
+              {/* Seçenek A: Tab Navigation Switcher */}
+              <nav className="flex items-center p-1 rounded-2xl bg-stone-200/60 dark:bg-slate-800/80 border border-stone-200 dark:border-slate-700 shadow-2xs self-start sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => onSelectTab?.('reading')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'reading'
+                      ? 'bg-white dark:bg-slate-900 text-stone-900 dark:text-white shadow-2xs'
+                      : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white'
+                  }`}
+                >
+                  <BookOpen className="h-4 w-4 text-sage-700 dark:text-emerald-400" />
+                  <span>Okuma Takibi</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onSelectTab?.('tasks')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'tasks'
+                      ? 'bg-white dark:bg-slate-900 text-stone-900 dark:text-white shadow-2xs'
+                      : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white'
+                  }`}
+                >
+                  <ClipboardList className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <span>Görev Panosu</span>
+                </button>
+              </nav>
             </div>
 
             {/* Right Header Controls, Theme Toggle & Live Countdown Pill */}
-            <div className="flex flex-wrap items-center justify-between md:justify-end gap-2.5 sm:gap-3">
+            <div className="flex flex-wrap items-center justify-between lg:justify-end gap-2.5 sm:gap-3">
               
               {/* Live 23:30 Countdown Pill */}
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold shadow-xs ${
@@ -74,7 +115,7 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats, them
                   : 'bg-amber-50/90 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-400'
               }`}>
                 <Clock className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
-                <span>Giriş Kapanışı 23:30</span>
+                <span className="hidden sm:inline">Giriş Kapanışı 23:30</span>
                 <span className="font-mono text-stone-900 dark:text-white font-bold bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-amber-200 dark:border-slate-700 shadow-2xs">
                   {isPastDeadline ? 'Kapadı' : countdownText}
                 </span>
@@ -97,7 +138,14 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats, them
 
               {/* Auth Status */}
               {userProfile ? (
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2">
+                  {/* Admin Badge */}
+                  {isAdmin && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 shadow-2xs" title="Yönetici Yetkisi Aktif">
+                      <Crown className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" /> Admin
+                    </span>
+                  )}
+
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border shadow-2xs ${badgeStyle.bg} ${badgeStyle.border}`}>
                     <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: userProfile.badge_color || badgeStyle.hex }}></span>
                     <span className={`text-xs font-semibold ${badgeStyle.text}`}>
@@ -126,7 +174,8 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats, them
         </div>
       </header>
 
-      {/* Global Live Summary Stats Cards - Scrolls naturally with content */}
+      {/* Global Live Summary Stats Cards - Only shown on Reading Tracker tab */}
+      {activeTab === 'reading' && (
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-6">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div className="paper-card dark:bg-slate-900 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition hover:border-stone-300 dark:hover:border-slate-700">
@@ -184,6 +233,7 @@ export default function Header({ userProfile, onOpenAuth, onSignOut, stats, them
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }

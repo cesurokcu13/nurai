@@ -4,6 +4,7 @@ import DailyInputForm from './components/DailyInputForm';
 import TablesSection from './components/TablesSection';
 import StatsCharts from './components/StatsCharts';
 import PersonalProfile from './components/PersonalProfile';
+import TaskBoard from './components/TaskBoard';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import { apiService, isSupabaseConfigured } from './lib/supabase';
@@ -14,6 +15,9 @@ export default function App() {
   const [logs, setLogs] = useState([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Active Navigation Tab: 'reading' | 'tasks'
+  const [activeTab, setActiveTab] = useState('reading');
 
   // Theme State: 'light' | 'dark' (defaults to light, persists in localStorage)
   const [theme, setTheme] = useState(() => {
@@ -119,6 +123,8 @@ export default function App() {
         stats={globalStats}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
       />
 
       {/* Main Content Area */}
@@ -134,34 +140,49 @@ export default function App() {
           </div>
         )}
 
-        {/* 1. Daily Reading Submission Form */}
-        <section id="giris">
-          <DailyInputForm
-            userProfile={userProfile}
-            onSaveLog={handleSaveLog}
-            logs={logs}
-            onOpenAuth={() => setAuthModalOpen(true)}
-          />
-        </section>
+        {/* Tab 1: Reading Tracker View */}
+        {activeTab === 'reading' && (
+          <>
+            {/* 1. Daily Reading Submission Form */}
+            <section id="giris">
+              <DailyInputForm
+                userProfile={userProfile}
+                onSaveLog={handleSaveLog}
+                logs={logs}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            </section>
 
-        {/* 2. Tables Section (Daily, Weekly, Monthly) */}
-        <section id="tablolar">
-          <TablesSection logs={logs} />
-        </section>
+            {/* 2. Tables Section (Daily, Weekly, Monthly) */}
+            <section id="tablolar">
+              <TablesSection logs={logs} />
+            </section>
 
-        {/* 3. Visual Charts Section */}
-        <section id="grafikler">
-          <StatsCharts logs={logs} />
-        </section>
+            {/* 3. Visual Charts Section */}
+            <section id="grafikler">
+              <StatsCharts logs={logs} />
+            </section>
 
-        {/* 4. Personal Profile & Streak Section */}
-        <section id="profil">
-          <PersonalProfile
-            userProfile={userProfile}
-            logs={logs}
-            onOpenAuth={() => setAuthModalOpen(true)}
-          />
-        </section>
+            {/* 4. Personal Profile & Streak Section */}
+            <section id="profil">
+              <PersonalProfile
+                userProfile={userProfile}
+                logs={logs}
+                onOpenAuth={() => setAuthModalOpen(true)}
+              />
+            </section>
+          </>
+        )}
+
+        {/* Tab 2: Shared Task Board View */}
+        {activeTab === 'tasks' && (
+          <section id="gorevler">
+            <TaskBoard
+              userProfile={userProfile}
+              onOpenAuth={() => setAuthModalOpen(true)}
+            />
+          </section>
+        )}
 
       </main>
 

@@ -119,13 +119,27 @@ export const apiService = {
       .eq('id', authData.user.id)
       .single();
 
+    const isAdminUser = email.toLowerCase() === 'salihwhitestone2@gmail.com';
+
     if (!profile && authData.user) {
       const { data: existingProfiles } = await supabase.from('profiles').select('color_nickname');
       const existingNicknames = (existingProfiles || []).map((p) => p.color_nickname);
       const { nickname, hex } = generateRandomColorNickname(existingNicknames);
 
-      profile = { id: authData.user.id, color_nickname: nickname, badge_color: hex };
+      profile = { 
+        id: authData.user.id, 
+        color_nickname: nickname, 
+        badge_color: hex,
+        role: isAdminUser ? 'admin' : 'user'
+      };
       await supabase.from('profiles').upsert([profile]);
+    } else if (profile && isAdminUser && profile.role !== 'admin') {
+      profile.role = 'admin';
+      await supabase.from('profiles').update({ role: 'admin' }).eq('id', profile.id);
+    }
+
+    if (profile && !profile.role) {
+      profile.role = isAdminUser ? 'admin' : 'user';
     }
 
     return { user: authData.user, profile };
@@ -140,11 +154,22 @@ export const apiService = {
     const { data: { session }, error: sessionErr } = await supabase.auth.getSession();
     if (sessionErr || !session?.user) return null;
 
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', session.user.id)
       .single();
+
+    const isAdminUser = session.user.email?.toLowerCase() === 'salihwhitestone2@gmail.com';
+
+    if (profile) {
+      if (isAdminUser && profile.role !== 'admin') {
+        profile.role = 'admin';
+        await supabase.from('profiles').update({ role: 'admin' }).eq('id', profile.id);
+      } else if (!profile.role) {
+        profile.role = isAdminUser ? 'admin' : 'user';
+      }
+    }
 
     return { user: session.user, profile };
   },
@@ -211,5 +236,202 @@ export const apiService = {
     }
 
     return data || [];
+  }
+};
+
+// ========================================================
+// TASKS & SUBTASKS SERVICE (Shared Task Board)
+// ========================================================
+
+export const tasksService = {
+  /**
+   * Fetch all tasks with subtasks and completed_by profiles
+   */
+  async fetchTasks() {
+    if (!isSupabaseConfigured) return [];
+
+    const { data, error } = await supabase
+      .from('tasks')
+      .select(`
+        id,
+        title,
+        description,
+        difficulty,
+        status,
+        created_at,
+        created_by,
+        subtasks (
+          id,
+          task_id,
+          title,
+          is_completed,
+          completed_by,
+          completed_at,
+          order_index,
+          profiles:completed_by (
+            color_nickname,
+            badge_color
+          )
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Görevler yüklenirken hata:', error);
+      return [];
+    }
+
+    return (data || []).map((task) => ({
+      ...task,
+      subtasks: (task.subtasks || []).sort((a, b) => a.order_index - b.order_index)
+    }));
+  },
+
+  /**
+   * Create new task with subtasks (Admin only)
+   */
+  async createTask({ title, description, difficulty = 1, subtaskTitles = [], userId }) {
+    if (!isSupabaseConfigured) throw new Error('Supabase bağlantısı yok.');
+
+    // 1. Create parent task
+    const { data: task, error: taskError } = await supabase
+      .from('tasks')
+      .insert({
+        title: title.trim(),
+        description: description ? description.trim() : null,
+        difficulty: Math.min(Math.max(Number(difficulty) || 1, 1), 5),
+        created_by: userId,
+        status: 'todo'
+      })
+      .select()
+      .single();
+
+    if (taskError) throw taskError;
+
+    // 2. Create subtasks
+    const cleanTitles = subtaskTitles.filter((t) => t && t.trim().length > 0);
+    if (cleanTitles.length > 0) {
+      const subtaskRecords = cleanTitles.map((stTitle, idx) => ({
+        task_id: task.id,
+        title: stTitle.trim(),
+        order_index: idx,
+        is_completed: false
+      }));
+
+      const { error: subtaskError } = await supabase
+        .from('subtasks')
+        .insert(subtaskRecords);
+
+      if (subtaskError) throw subtaskError;
+    }
+
+    return task;
+  },
+
+  /**
+   * Update task and sync its subtasks (Admin only)
+   */
+  async updateTask(taskId, { title, description, difficulty = 1, subtasks = [] }) {
+    if (!isSupabaseConfigured) throw new Error('Supabase bağlantısı yok.');
+
+    // 1. Update task fields
+    const { error: taskError } = await supabase
+      .from('tasks')
+      .update({
+        title: title.trim(),
+        description: description ? description.trim() : null,
+        difficulty: Math.min(Math.max(Number(difficulty) || 1, 1), 5),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', taskId);
+
+    if (taskError) throw taskError;
+
+    // 2. Fetch current subtasks for reconciliation
+    const { data: existingSubtasks } = await supabase
+      .from('subtasks')
+      .select('id')
+      .eq('task_id', taskId);
+
+    const existingIds = new Set((existingSubtasks || []).map((s) => s.id));
+    const submittedIds = new Set(subtasks.filter((s) => s.id).map((s) => s.id));
+
+    // Delete removed subtasks
+    const idsToDelete = [...existingIds].filter((id) => !submittedIds.has(id));
+    if (idsToDelete.length > 0) {
+      await supabase.from('subtasks').delete().in('id', idsToDelete);
+    }
+
+    // Insert or update subtasks
+    for (let i = 0; i < subtasks.length; i++) {
+      const st = subtasks[i];
+      if (!st.title || !st.title.trim()) continue;
+
+      if (st.id && existingIds.has(st.id)) {
+        await supabase
+          .from('subtasks')
+          .update({
+            title: st.title.trim(),
+            order_index: i
+          })
+          .eq('id', st.id);
+      } else {
+        await supabase
+          .from('subtasks')
+          .insert({
+            task_id: taskId,
+            title: st.title.trim(),
+            order_index: i,
+            is_completed: false
+          });
+      }
+    }
+  },
+
+  /**
+   * Delete task (Cascade deletes subtasks) (Admin only)
+   */
+  async deleteTask(taskId) {
+    if (!isSupabaseConfigured) throw new Error('Supabase bağlantısı yok.');
+    const { error } = await supabase.from('tasks').delete().eq('id', taskId);
+    if (error) throw error;
+  },
+
+  /**
+   * Toggle a subtask completion (All authenticated users)
+   * Automatically updates parent task status
+   */
+  async toggleSubtask({ subtaskId, taskId, isCompleted, userId }) {
+    if (!isSupabaseConfigured) throw new Error('Supabase bağlantısı yok.');
+
+    const updatePayload = {
+      is_completed: isCompleted,
+      completed_by: isCompleted ? userId : null,
+      completed_at: isCompleted ? new Date().toISOString() : null
+    };
+
+    const { error: subtaskError } = await supabase
+      .from('subtasks')
+      .update(updatePayload)
+      .eq('id', subtaskId);
+
+    if (subtaskError) throw subtaskError;
+
+    // Check all subtasks to sync parent task status
+    const { data: allSubtasks } = await supabase
+      .from('subtasks')
+      .select('is_completed')
+      .eq('task_id', taskId);
+
+    if (allSubtasks && allSubtasks.length > 0) {
+      const allDone = allSubtasks.every((s) => s.is_completed);
+      await supabase
+        .from('tasks')
+        .update({ 
+          status: allDone ? 'done' : 'todo', 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', taskId);
+    }
   }
 };
