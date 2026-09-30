@@ -236,7 +236,7 @@ export default function DailyInputForm({ userProfile, onSaveLog, logs, onOpenAut
               max="1000"
               required
               disabled={isInputDisabled}
-              placeholder={isInputDisabled ? 'Kapanmıştır' : 'Örn: 20'}
+              placeholder={isInputDisabled ? 'Kapanmıştır' : 'Örn: 30'}
               value={pageCount}
               onChange={(e) => setPageCount(e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-slate-950 border border-stone-300 dark:border-slate-700 text-stone-900 dark:text-white text-sm font-semibold placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:border-sage-600 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
