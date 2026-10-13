@@ -315,7 +315,7 @@ export default function JuzTracker({ userProfile, onOpenAuth }) {
               Kur'an-ı Kerim Ortak Hatim Halkası
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 dark:text-slate-400 max-w-xl">
-              Cüzünüzü kutucuklardan seçin veya sistem size rastgele bir cüz atasın. Herkes cüzünü okudukça Kur'an-ı Kerim baştan sona hep beraber hatmedilmiş olur.
+              Okumak istediğiniz Cüzü kutucuklardan seçin veya sistem size rastgele bir cüz atasın. Hep birlikte Kur'an-ı Kerimi baştan sona hatmedelim.
             </p>
           </div>
 
