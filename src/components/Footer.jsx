@@ -14,7 +14,7 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500 dark:text-slate-400 border-t border-stone-200/80 dark:border-slate-800 pt-6">
           <div className="flex items-center gap-2 text-sage-800 dark:text-emerald-400 font-semibold font-serif">
             <BookOpen className="h-4 w-4 text-sage-700 dark:text-emerald-400" />
-            <span>Risale-i Nur Birlikte Okuma Halkası</span>
+            <span>Medresem — Birlikte Okuma Halkası</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-3 text-stone-500 dark:text-slate-400">

@@ -9,8 +9,10 @@ import {
   UserCheck, 
   AlertTriangle, 
   X, 
-  Sparkles 
+  Sparkles,
+  User
 } from 'lucide-react';
+import { getMatchedRealName, setMatchedRealName } from '../utils/userRealName';
 
 export default function TaskCard({
   task,
@@ -45,7 +47,7 @@ export default function TaskCard({
       return;
     }
 
-    const savedRealName = localStorage.getItem('nurai_user_real_name') || '';
+    const savedRealName = getMatchedRealName() || '';
 
     setNameModal({
       isOpen: true,
@@ -67,7 +69,7 @@ export default function TaskCard({
 
     // Save real name for convenient prefill in future subtasks
     try {
-      localStorage.setItem('nurai_user_real_name', trimmed);
+      setMatchedRealName(null, trimmed);
     } catch {}
 
     const targetSubtask = nameModal.subtask;

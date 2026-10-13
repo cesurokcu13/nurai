@@ -63,7 +63,7 @@ export default function Header({
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-lg sm:text-xl font-bold font-serif text-stone-900 dark:text-white tracking-tight">
-                      Risale-i Nur Okuma Halkası
+                      Medresem
                     </h1>
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sage-50 dark:bg-emerald-500/10 text-sage-800 dark:text-emerald-400 border border-sage-200 dark:border-emerald-500/20">
                       <ShieldCheck className="h-3 w-3" /> Anonim

@@ -17,8 +17,28 @@ export default function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Active Navigation Tab: 'reading' | 'tasks'
-  const [activeTab, setActiveTab] = useState('reading');
+  // Active Navigation Tab: 'reading' | 'tasks' | 'juz' (persists across page reloads)
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = window.location.hash.replace('#', '').toLowerCase();
+    if (hash === 'juz' || hash === 'cuz' || hash === 'cuz-takibi') return 'juz';
+    if (hash === 'tasks' || hash === 'gorevler') return 'tasks';
+    if (hash === 'reading' || hash === 'okuma') return 'reading';
+
+    const saved = localStorage.getItem('nurai_active_tab');
+    if (['reading', 'tasks', 'juz'].includes(saved)) {
+      return saved;
+    }
+    return 'reading';
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('nurai_active_tab', activeTab);
+      if (window.location.hash !== `#${activeTab}`) {
+        window.history.replaceState(null, '', `#${activeTab}`);
+      }
+    } catch {}
+  }, [activeTab]);
 
   // Theme State: 'light' | 'dark' (defaults to light, persists in localStorage)
   const [theme, setTheme] = useState(() => {
