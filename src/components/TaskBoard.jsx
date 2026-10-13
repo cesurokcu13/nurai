@@ -43,7 +43,7 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
   }, [loadTasks]);
 
   // Handle Subtask Toggle (Check / Uncheck)
-  const handleToggleSubtask = async ({ subtaskId, taskId, isCompleted }) => {
+  const handleToggleSubtask = async ({ subtaskId, taskId, isCompleted, realName = null }) => {
     if (!userProfile) {
       onOpenAuth();
       return;
@@ -60,7 +60,8 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
             ...st,
             is_completed: isCompleted,
             completed_by: isCompleted ? userProfile.id : null,
-            profiles: isCompleted ? userProfile : null
+            completed_by_name: isCompleted ? realName : null,
+            profiles: null
           };
         });
 
@@ -79,7 +80,8 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
         subtaskId,
         taskId,
         isCompleted,
-        userId: userProfile.id
+        userId: userProfile.id,
+        realName
       });
 
       // Check if this action completed the entire task -> fire confetti!

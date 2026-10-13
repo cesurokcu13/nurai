@@ -250,40 +250,81 @@ export const tasksService = {
   async fetchTasks() {
     if (!isSupabaseConfigured) return [];
 
-    const { data, error } = await supabase
-      .from('tasks')
-      .select(`
-        id,
-        title,
-        description,
-        difficulty,
-        status,
-        created_at,
-        created_by,
-        subtasks (
+    let data = null;
+    let error = null;
+
+    try {
+      const res = await supabase
+        .from('tasks')
+        .select(`
           id,
-          task_id,
           title,
-          is_completed,
-          completed_by,
-          completed_at,
-          order_index,
-          profiles:completed_by (
-            color_nickname,
-            badge_color
+          description,
+          difficulty,
+          status,
+          created_at,
+          created_by,
+          subtasks (
+            id,
+            task_id,
+            title,
+            is_completed,
+            completed_by,
+            completed_by_name,
+            completed_at,
+            order_index
           )
-        )
-      `)
-      .order('created_at', { ascending: false });
+        `)
+        .order('created_at', { ascending: false });
+      data = res.data;
+      error = res.error;
+    } catch (e) {
+      error = e;
+    }
+
+    // Fallback if completed_by_name column does not exist yet in remote Supabase table
+    if (error) {
+      const fallback = await supabase
+        .from('tasks')
+        .select(`
+          id,
+          title,
+          description,
+          difficulty,
+          status,
+          created_at,
+          created_by,
+          subtasks (
+            id,
+            task_id,
+            title,
+            is_completed,
+            completed_by,
+            completed_at,
+            order_index
+          )
+        `)
+        .order('created_at', { ascending: false });
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       console.error('Görevler yüklenirken hata:', error);
       return [];
     }
 
+    let localNamesMap = {};
+    try {
+      localNamesMap = JSON.parse(localStorage.getItem('nurai_subtask_completer_names') || '{}');
+    } catch {}
+
     return (data || []).map((task) => ({
       ...task,
-      subtasks: (task.subtasks || []).sort((a, b) => a.order_index - b.order_index)
+      subtasks: (task.subtasks || []).map((st) => ({
+        ...st,
+        completed_by_name: st.completed_by_name || localNamesMap[st.id] || null
+      })).sort((a, b) => a.order_index - b.order_index)
     }));
   },
 
@@ -399,21 +440,43 @@ export const tasksService = {
 
   /**
    * Toggle a subtask completion (All authenticated users)
-   * Automatically updates parent task status
+   * Automatically updates parent task status and saves completer's real name
    */
-  async toggleSubtask({ subtaskId, taskId, isCompleted, userId }) {
+  async toggleSubtask({ subtaskId, taskId, isCompleted, userId, realName = null }) {
     if (!isSupabaseConfigured) throw new Error('Supabase bağlantısı yok.');
+
+    // Save/clean local name cache
+    try {
+      const map = JSON.parse(localStorage.getItem('nurai_subtask_completer_names') || '{}');
+      if (isCompleted && realName) {
+        map[subtaskId] = realName;
+      } else {
+        delete map[subtaskId];
+      }
+      localStorage.setItem('nurai_subtask_completer_names', JSON.stringify(map));
+    } catch {}
 
     const updatePayload = {
       is_completed: isCompleted,
       completed_by: isCompleted ? userId : null,
+      completed_by_name: isCompleted ? realName : null,
       completed_at: isCompleted ? new Date().toISOString() : null
     };
 
-    const { error: subtaskError } = await supabase
+    let { error: subtaskError } = await supabase
       .from('subtasks')
       .update(updatePayload)
       .eq('id', subtaskId);
+
+    // Fallback if completed_by_name column does not exist yet in Supabase
+    if (subtaskError && subtaskError.message?.includes('completed_by_name')) {
+      delete updatePayload.completed_by_name;
+      const res = await supabase
+        .from('subtasks')
+        .update(updatePayload)
+        .eq('id', subtaskId);
+      subtaskError = res.error;
+    }
 
     if (subtaskError) throw subtaskError;
 

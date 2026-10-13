@@ -32,10 +32,15 @@ CREATE TABLE IF NOT EXISTS public.subtasks (
   title TEXT NOT NULL,
   is_completed BOOLEAN NOT NULL DEFAULT false,
   completed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  completed_by_name TEXT,
   completed_at TIMESTAMP WITH TIME ZONE,
   order_index INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Var olan subtasks tablosuna completed_by_name sütunu ekle (varsa dokunmaz)
+ALTER TABLE public.subtasks 
+ADD COLUMN IF NOT EXISTS completed_by_name TEXT;
 
 -- 4. İNDEKSLER
 CREATE INDEX IF NOT EXISTS idx_tasks_status ON public.tasks(status);
