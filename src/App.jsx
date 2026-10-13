@@ -5,6 +5,7 @@ import TablesSection from './components/TablesSection';
 import StatsCharts from './components/StatsCharts';
 import PersonalProfile from './components/PersonalProfile';
 import TaskBoard from './components/TaskBoard';
+import JuzTracker from './components/JuzTracker/JuzTracker';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
 import { apiService, isSupabaseConfigured } from './lib/supabase';
@@ -178,6 +179,16 @@ export default function App() {
         {activeTab === 'tasks' && (
           <section id="gorevler">
             <TaskBoard
+              userProfile={userProfile}
+              onOpenAuth={() => setAuthModalOpen(true)}
+            />
+          </section>
+        )}
+
+        {/* Tab 3: Quran Juz & Collective Hatim View */}
+        {activeTab === 'juz' && (
+          <section id="cuz-takibi">
+            <JuzTracker
               userProfile={userProfile}
               onOpenAuth={() => setAuthModalOpen(true)}
             />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock, Lock, Sun, Moon, ClipboardList, Crown } from 'lucide-react';
+import { BookOpen, Users, Sparkles, LogIn, LogOut, ShieldCheck, Clock, Lock, Sun, Moon, ClipboardList, Crown, BookMarked } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../utils/nicknameGenerator';
 
 export default function Header({ 
@@ -101,6 +101,19 @@ export default function Header({
                 >
                   <ClipboardList className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                   <span>Görev Panosu</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onSelectTab?.('juz')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'juz'
+                      ? 'bg-white dark:bg-slate-900 text-stone-900 dark:text-white shadow-2xs'
+                      : 'text-stone-600 dark:text-slate-400 hover:text-stone-900 dark:hover:text-white'
+                  }`}
+                >
+                  <BookMarked className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>Cüz Takibi</span>
                 </button>
               </nav>
             </div>

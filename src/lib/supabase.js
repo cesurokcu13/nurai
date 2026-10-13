@@ -435,3 +435,6 @@ export const tasksService = {
     }
   }
 };
+
+export { juzService } from './juzService';
+
