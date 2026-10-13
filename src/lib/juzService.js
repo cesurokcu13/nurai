@@ -71,8 +71,9 @@ export const juzService = {
   /**
    * Fetch Active Hatim Round with all 30 Juz assignments.
    * If none exists, creates Round 1.
+   * Ensures strict privacy: only the current user's own profile is attached; others are hidden.
    */
-  async fetchActiveRound() {
+  async fetchActiveRound(currentUserId = null) {
     if (isSupabaseConfigured && supabase) {
       try {
         // 1. Check for an active round
@@ -195,24 +196,32 @@ export const juzService = {
           }
         }
 
+        const sanitized = fullAssignments.map((a) => {
+          const isMine = currentUserId && a.user_id === currentUserId;
+          return {
+            ...a,
+            profiles: isMine ? a.profiles : null
+          };
+        });
+
         return {
           round: activeRound,
-          assignments: fullAssignments,
+          assignments: sanitized,
           isLiveDb: true
         };
       } catch (err) {
         console.warn('Supabase cüz servisi hatası:', err);
-        return this.getLocalActiveRound();
+        return this.getLocalActiveRound(currentUserId);
       }
     }
 
-    return this.getLocalActiveRound();
+    return this.getLocalActiveRound(currentUserId);
   },
 
   /**
    * LocalStorage Fallback for Active Round
    */
-  getLocalActiveRound() {
+  getLocalActiveRound(currentUserId = null) {
     const state = getLocalState();
     let active = state.rounds.find((r) => r.status === 'active');
 
@@ -232,9 +241,17 @@ export const juzService = {
       saveLocalState(state);
     }
 
+    const sanitized = (active.assignments || []).map((a) => {
+      const isMine = currentUserId && a.user_id === currentUserId;
+      return {
+        ...a,
+        profiles: isMine ? a.profiles : null
+      };
+    });
+
     return {
       round: active,
-      assignments: active.assignments || [],
+      assignments: sanitized,
       isLiveDb: false
     };
   },

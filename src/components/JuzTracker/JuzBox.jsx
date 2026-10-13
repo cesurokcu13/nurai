@@ -3,12 +3,10 @@ import {
   CheckCircle2, 
   Clock, 
   BookOpen, 
-  User, 
   Sparkles, 
   Undo2, 
   Check, 
-  Bookmark,
-  ChevronRight
+  Bookmark
 } from 'lucide-react';
 import { getBadgeStyleForNickname } from '../../utils/nicknameGenerator';
 
@@ -25,15 +23,15 @@ export default function JuzBox({
   const isTaken = assignment.status === 'taken';
   const isCompleted = assignment.status === 'completed';
 
+  // Only the user themselves is recognized as the owner of their reading
   const isCurrentUserOwner = Boolean(
     userProfile && assignment.user_id && assignment.user_id === userProfile.id
   );
 
   const isAdmin = userProfile?.role === 'admin';
 
-  // Badge styling for assignee
-  const assigneeNickname = assignment.profiles?.color_nickname || (isCurrentUserOwner ? userProfile?.color_nickname : 'Anonim');
-  const badgeStyle = getBadgeStyleForNickname(assigneeNickname);
+  // Badge styling strictly for current user
+  const userBadgeStyle = userProfile ? getBadgeStyleForNickname(userProfile.color_nickname) : null;
 
   // Format date helper
   const formatDate = (isoStr) => {
@@ -101,40 +99,58 @@ export default function JuzBox({
         </div>
       </div>
 
-      {/* Middle Content: Surah Range or Reader Badge */}
+      {/* Middle Content: Surah Range & Privacy-Aware Reader Display */}
       <div className="my-2.5 space-y-1.5">
         <p className="text-[11px] text-stone-600 dark:text-slate-400 truncate" title={juzInfo.surahRange}>
           {juzInfo.surahRange || 'Kur\'an-ı Kerim'}
         </p>
 
-        {/* Reader Display when Taken or Completed */}
-        {(isTaken || isCompleted) && (
-          <div className="flex items-center gap-1.5 pt-0.5">
-            <div
-              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-semibold max-w-full border shadow-2xs truncate ${badgeStyle.bg} ${badgeStyle.border} ${badgeStyle.text}`}
-              title={assigneeNickname}
-            >
-              <span
-                className="h-2 w-2 rounded-full shrink-0"
-                style={{ backgroundColor: badgeStyle.hex }}
-              />
-              <span className="truncate text-[11px]">
-                {assigneeNickname}
+        {/* 1. If Current User is the Reader -> Show User's Own Badge */}
+        {isCurrentUserOwner && userBadgeStyle && (
+          <div className="space-y-1 pt-0.5">
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-semibold max-w-full border shadow-2xs truncate ${userBadgeStyle.bg} ${userBadgeStyle.border} ${userBadgeStyle.text}`}
+                title={userProfile.color_nickname}
+              >
+                <span
+                  className="h-2 w-2 rounded-full shrink-0"
+                  style={{ backgroundColor: userBadgeStyle.hex }}
+                />
+                <span className="truncate text-[11px]">
+                  {userProfile.color_nickname}
+                </span>
+              </div>
+
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                isCompleted 
+                  ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/40' 
+                  : 'text-amber-700 dark:text-amber-300 bg-amber-100/80 dark:bg-amber-900/40'
+              }`}>
+                Siz
               </span>
             </div>
 
-            {isCurrentUserOwner && (
-              <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100/80 dark:bg-amber-900/40 px-1.5 py-0.5 rounded">
-                Siz
-              </span>
+            {isCompleted && assignment.completed_at && (
+              <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
+                Okudunuz: {formatDate(assignment.completed_at)}
+              </div>
             )}
           </div>
         )}
 
-        {/* Completion Date */}
-        {isCompleted && assignment.completed_at && (
-          <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium">
-            Tamamlandı: {formatDate(assignment.completed_at)}
+        {/* 2. If Someone Else Took or Read -> DO NOT SHOW WHO READ IT (Full Privacy) */}
+        {!isCurrentUserOwner && isTaken && (
+          <div className="flex items-center gap-1.5 pt-0.5 text-amber-700 dark:text-amber-400">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
+            <span className="text-xs font-medium">Şu an okunuyor</span>
+          </div>
+        )}
+
+        {!isCurrentUserOwner && isCompleted && (
+          <div className="flex items-center gap-1.5 pt-0.5 text-emerald-700 dark:text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+            <span className="text-xs font-medium">Okundu</span>
           </div>
         )}
       </div>
@@ -154,7 +170,7 @@ export default function JuzBox({
           </button>
         )}
 
-        {/* Taken State: If Current User's Juz, Show "Okudum" & "Bırak" */}
+        {/* Taken State: Current User's Juz -> Show "Okudum" & "Bırak" */}
         {isTaken && isCurrentUserOwner && (
           <div className="flex items-center gap-1.5">
             <button
@@ -180,10 +196,10 @@ export default function JuzBox({
           </div>
         )}
 
-        {/* Taken State: Other User's Juz */}
+        {/* Taken State: Someone Else's Juz -> Show Anonymous In-Progress Status */}
         {isTaken && !isCurrentUserOwner && (
           <div className="flex items-center justify-between text-xs text-amber-800 dark:text-amber-400 font-medium">
-            <span className="text-[11px]">Şu an okunuyor...</span>
+            <span className="text-[11px]">Alındı • Okunuyor</span>
             {isAdmin && (
               <button
                 type="button"
@@ -197,12 +213,12 @@ export default function JuzBox({
           </div>
         )}
 
-        {/* Completed State */}
+        {/* Completed State: If Owner -> Can Undo; If Other -> Show Anonymous "Tamamlandı" */}
         {isCompleted && (
           <div className="flex items-center justify-between text-xs text-emerald-800 dark:text-emerald-300 font-medium">
             <span className="flex items-center gap-1 text-[11px] font-semibold">
               <Sparkles className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-              Allah kabul etsin
+              {isCurrentUserOwner ? 'Allah kabul etsin' : 'Tamamlandı'}
             </span>
             {(isCurrentUserOwner || isAdmin) && (
               <button

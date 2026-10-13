@@ -57,7 +57,7 @@ export default function JuzTracker({ userProfile, onOpenAuth }) {
     try {
       setLoading(true);
       const [activeData, roundsData] = await Promise.all([
-        juzService.fetchActiveRound(),
+        juzService.fetchActiveRound(userProfile?.id),
         juzService.fetchAllRounds()
       ]);
 
