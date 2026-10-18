@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Star, Plus, Trash2, Check, AlertCircle } from 'lucide-react';
 
-export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = null }) {
+export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = null, userProfile }) {
+  const [realName, setRealName] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState(1);
@@ -11,6 +12,7 @@ export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = nu
   const [error, setError] = useState('');
 
   const isEditing = Boolean(taskToEdit);
+  const needsName = !isEditing && !userProfile?.real_name?.trim();
 
   useEffect(() => {
     if (taskToEdit) {
@@ -30,6 +32,7 @@ export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = nu
     }
     setNewSubtaskInput('');
     setError('');
+    setRealName('');
   }, [taskToEdit, isOpen]);
 
   if (!isOpen) return null;
@@ -60,6 +63,10 @@ export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = nu
       setError('Lütfen bir görev başlığı girin.');
       return;
     }
+    if (needsName && !realName.trim()) {
+      setError('Lütfen adınızı ve soyadınızı giriniz.');
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -72,6 +79,7 @@ export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = nu
       }
 
       await onSave({
+        realName: realName.trim(),
         taskId: taskToEdit?.id,
         title: title.trim(),
         description: description.trim(),
@@ -135,6 +143,13 @@ export default function TaskFormModal({ isOpen, onClose, onSave, taskToEdit = nu
             />
           </div>
 
+          {needsName && (
+            <div>
+              <label htmlFor="task-real-name" className="block text-sm font-semibold mb-1.5">Adınız ve soyadınız</label>
+              <input id="task-real-name" required value={realName} onChange={(e) => setRealName(e.target.value)} autoComplete="name" className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-slate-700 dark:bg-slate-800" />
+              <p className="text-xs text-stone-500 mt-1.5">İsminiz profilinize kaydedilir. Görev eklerken veya tamamlarken tekrar sorulmaz.</p>
+            </div>
+          )}
           {/* Task Description */}
           <div>
             <label className="block text-xs font-semibold text-stone-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">

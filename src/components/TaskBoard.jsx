@@ -14,9 +14,10 @@ import {
 import confetti from 'canvas-confetti';
 import TaskCard from './TaskCard';
 import TaskFormModal from './TaskFormModal';
-import { tasksService } from '../lib/supabase';
+import { tasksService, apiService } from '../lib/supabase';
+import { setMatchedRealName } from '../utils/userRealName';
 
-export default function TaskBoard({ userProfile, onOpenAuth }) {
+export default function TaskBoard({ userProfile, onOpenAuth, onUpdateUserProfile }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -24,6 +25,13 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
   const [difficultyFilter, setDifficultyFilter] = useState('all');
 
   const isAdmin = userProfile?.role === 'admin';
+
+  const saveProfileName = async (name) => {
+    const saved = await apiService.saveRealName(userProfile.id, name);
+    setMatchedRealName(userProfile.id, saved.real_name);
+    onUpdateUserProfile?.({ ...userProfile, real_name: saved.real_name });
+    return saved.real_name;
+  };
 
   // Load tasks from Supabase
   const loadTasks = useCallback(async () => {
@@ -43,10 +51,15 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
   }, [loadTasks]);
 
   // Handle Subtask Toggle (Check / Uncheck)
-  const handleToggleSubtask = async ({ subtaskId, taskId, isCompleted, realName = null }) => {
+  const handleToggleSubtask = async ({ subtaskId, taskId, isCompleted, realName = null, saveNameToProfile = false }) => {
     if (!userProfile) {
       onOpenAuth();
       return;
+    }
+
+    // If this is the first time entering a real name, save it to Supabase profiles table
+    if (isCompleted && !userProfile.real_name?.trim()) {
+      realName = await saveProfileName(realName);
     }
 
     // Optimistic UI update
@@ -105,7 +118,11 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
   };
 
   // Handle Save Task (Create or Edit)
-  const handleSaveTask = async ({ taskId, title, description, difficulty, subtasks }) => {
+  const handleSaveTask = async ({ taskId, title, description, difficulty, subtasks, realName }) => {
+    if (!userProfile) throw new Error('Lütfen giriş yapınız.');
+    if (!taskId && !userProfile.real_name?.trim()) {
+      await saveProfileName(realName);
+    }
     if (taskId) {
       await tasksService.updateTask(taskId, {
         title,
@@ -411,6 +428,7 @@ export default function TaskBoard({ userProfile, onOpenAuth }) {
         }}
         onSave={handleSaveTask}
         taskToEdit={taskToEdit}
+        userProfile={userProfile}
       />
 
     </div>

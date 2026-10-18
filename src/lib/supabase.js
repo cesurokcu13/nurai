@@ -175,6 +175,26 @@ export const apiService = {
   },
 
   /**
+   * Save user's real name to profiles table (called once, on first task completion)
+   */
+  async saveRealName(userId, realName) {
+    if (!isSupabaseConfigured || !userId || !realName?.trim()) {
+      throw new Error('İsim kaydedilemedi. Lütfen giriş yapıp tekrar deneyin.');
+    }
+
+    const clean = realName.trim();
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ real_name: clean })
+        .eq('id', userId)
+        .select('id, real_name')
+        .single();
+      if (error) throw new Error('İsim veritabanına kaydedilemedi. Lütfen tekrar deneyin.', { cause: error });
+      return data;
+  },
+
+  /**
    * Sign Out from Supabase
    */
   async signOut() {

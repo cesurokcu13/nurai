@@ -201,6 +201,7 @@ export default function App() {
             <TaskBoard
               userProfile={userProfile}
               onOpenAuth={() => setAuthModalOpen(true)}
+              onUpdateUserProfile={(updatedProfile) => setUserProfile(updatedProfile)}
             />
           </section>
         )}

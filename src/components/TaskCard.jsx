@@ -12,7 +12,6 @@ import {
   Sparkles,
   User
 } from 'lucide-react';
-import { getMatchedRealName, setMatchedRealName } from '../utils/userRealName';
 
 export default function TaskCard({
   task,
@@ -40,19 +39,37 @@ export default function TaskCard({
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : (task.status === 'done' ? 100 : 0);
   const isDone = task.status === 'done' || (totalCount > 0 && completedCount === totalCount);
 
-  // When user clicks to complete a subtask -> ask for real name
-  const handleInitiateCompletion = (subtask) => {
+  // When user clicks to complete a subtask -> check for saved name first
+  const handleInitiateCompletion = async (subtask) => {
     if (!userProfile) {
       onOpenAuth();
       return;
     }
 
-    const savedRealName = getMatchedRealName() || '';
+    // Check saved real name: first from profile (DB), then from localStorage
+    const savedRealName = userProfile?.real_name?.trim() || '';
 
+    if (savedRealName) {
+      // Name already known -> complete directly without showing modal
+      try {
+        setLoadingSubtaskId(subtask.id);
+        await onToggleSubtask({
+          subtaskId: subtask.id,
+          taskId: task.id,
+          isCompleted: true,
+          realName: savedRealName
+        });
+      } finally {
+        setLoadingSubtaskId(null);
+      }
+      return;
+    }
+
+    // First time: open modal to ask for real name
     setNameModal({
       isOpen: true,
       subtask,
-      nameInput: savedRealName,
+      nameInput: '',
       error: ''
     });
   };
@@ -67,13 +84,7 @@ export default function TaskCard({
       return;
     }
 
-    // Save real name for convenient prefill in future subtasks
-    try {
-      setMatchedRealName(null, trimmed);
-    } catch {}
-
     const targetSubtask = nameModal.subtask;
-    setNameModal({ isOpen: false, subtask: null, nameInput: '', error: '' });
 
     if (!targetSubtask) return;
 
@@ -83,8 +94,12 @@ export default function TaskCard({
         subtaskId: targetSubtask.id,
         taskId: task.id,
         isCompleted: true,
-        realName: trimmed
+        realName: trimmed,
+        saveNameToProfile: true  // signal to save name to DB profile
       });
+      setNameModal({ isOpen: false, subtask: null, nameInput: '', error: '' });
+    } catch (err) {
+      setNameModal((prev) => ({ ...prev, error: err.message || 'İsim kaydedilemedi. Lütfen tekrar deneyin.' }));
     } finally {
       setLoadingSubtaskId(null);
     }
@@ -353,7 +368,7 @@ export default function TaskCard({
                   className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 dark:border-slate-700 bg-stone-50 dark:bg-slate-800 text-stone-900 dark:text-white text-xs sm:text-sm font-medium focus:outline-none focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-900 transition"
                 />
                 <p className="text-[11px] text-stone-500 dark:text-slate-400 mt-1.5">
-                  Görev panosunda takma adınız yerine burada yazdığınız gerçek isim görünecektir.
+                  Bu isim görev panosunda görünecektir. <strong>Bir kez girildiğinde hatırlanır</strong>, bir daha sorulmaz.
                 </p>
                 {nameModal.error && (
                   <p className="text-xs text-rose-600 font-medium mt-1">
@@ -372,6 +387,7 @@ export default function TaskCard({
                 </button>
                 <button
                   type="submit"
+                  disabled={loadingSubtaskId !== null}
                   className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
                 >
                   <Check className="h-4 w-4 stroke-[3]" />
