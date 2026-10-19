@@ -64,7 +64,10 @@ Uygulama varsayılan olarak **Demo Modunda** (LocalStorage) çalışır. Canlı 
    VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
    VITE_ADMIN_EMAIL=admin@example.com
    ```
-   Eski `VITE_SUPABASE_ANON_KEY` ayarı da geriye dönük olarak desteklenir. Temizlik oyununun ortak skor tablosu için `supabase_cleaning_game_schema.sql` içeriğini de çalıştırın. `profiles` tablosuna bağlı kayıtlar giriş yapmış kullanıcılar arasında paylaşılır; misafir skorları tarayıcıda saklanır.
+   Eski `VITE_SUPABASE_ANON_KEY` ayarı da geriye dönük olarak desteklenir.
+4. Oyuncular uygulamada kendi hesaplarıyla giriş yapmalı. Ortak skorlar `profiles.id` ile giriş yapan kullanıcıya bağlanır; misafir skorları yalnızca o tarayıcıda kalır.
+5. Uygulamayı GitHub Pages'te yayımlıyorsanız repository **Settings → Secrets and variables → Actions** bölümünde `VITE_SUPABASE_URL` ve `VITE_SUPABASE_PUBLISHABLE_KEY` repository secrets değerlerini tanımlayın. Deploy workflow'u bu değerleri derleme sırasında kullanır; secret ekledikten sonra `main` dalına yeni bir commit göndererek yeniden dağıtın. Tarayıcıda publishable key kullanılır; `service_role`/secret key'i frontend'e eklemeyin.
+6. Supabase SQL Editor'da `supabase_cleaning_game_schema.sql` dosyasını çalıştırın. Canlı puan güncellemesi gelmezse Supabase Dashboard → Database → Publications içinde `supabase_realtime` yayınının `cleaning_game_completions` tablosunu içerdiğini doğrulayın.
 
 ---
 

@@ -33,3 +33,19 @@ CREATE POLICY "Users can save their own cleaning game scores"
   ON public.cleaning_game_completions FOR INSERT
   TO authenticated
   WITH CHECK ((select auth.uid()) = user_id);
+
+-- Stream new task completions to connected clients for a live leaderboard.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'cleaning_game_completions'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime
+      ADD TABLE public.cleaning_game_completions;
+  END IF;
+END
+$$;

@@ -67,7 +67,21 @@ export default function CleaningGame({ userProfile, onOpenAuth }) {
     }
   }, [userProfile?.id]);
 
-  useEffect(() => { loadRemote(); }, [loadRemote]);
+  useEffect(() => {
+    loadRemote();
+    if (!isSupabaseConfigured || !userProfile?.id) return undefined;
+
+    const channel = supabase
+      .channel('cleaning-game-leaderboard')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'cleaning_game_completions'
+      }, () => loadRemote())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [loadRemote, userProfile?.id]);
 
   const remoteDone = useMemo(() => remoteRows.filter(row => row.user_id === userProfile?.id).map(row => row.task_key), [remoteRows, userProfile?.id]);
   const playerDone = useMemo(() => {
