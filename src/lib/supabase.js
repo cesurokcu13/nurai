@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { generateRandomColorNickname, getInitialLetter } from '../utils/nicknameGenerator';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
+const adminEmail = import.meta.env.VITE_ADMIN_EMAIL?.trim().toLowerCase();
 
 export const isSupabaseConfigured = Boolean(
   supabaseUrl && 
@@ -73,7 +74,7 @@ export const apiService = {
   async signInWithEmail(email, password) {
     if (!isSupabaseConfigured) {
       throw new Error(
-        'Supabase yapılandırılmadı! Lütfen .env veya GitHub Secrets içerisine VITE_SUPABASE_URL ve VITE_SUPABASE_ANON_KEY değerlerini ekleyin.'
+      'Supabase yapılandırılmadı! Lütfen .env veya GitHub Secrets içerisine VITE_SUPABASE_URL ve VITE_SUPABASE_PUBLISHABLE_KEY değerlerini ekleyin.'
       );
     }
 
@@ -119,7 +120,7 @@ export const apiService = {
       .eq('id', authData.user.id)
       .single();
 
-    const isAdminUser = email.toLowerCase() === 'salihwhitestone2@gmail.com';
+    const isAdminUser = Boolean(adminEmail && email.toLowerCase() === adminEmail);
 
     if (!profile && authData.user) {
       const { data: existingProfiles } = await supabase.from('profiles').select('color_nickname');
@@ -160,7 +161,7 @@ export const apiService = {
       .eq('id', session.user.id)
       .single();
 
-    const isAdminUser = session.user.email?.toLowerCase() === 'salihwhitestone2@gmail.com';
+    const isAdminUser = Boolean(adminEmail && session.user.email?.toLowerCase() === adminEmail);
 
     if (profile) {
       if (isAdminUser && profile.role !== 'admin') {

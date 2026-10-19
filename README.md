@@ -58,11 +58,13 @@ Uygulama varsayılan olarak **Demo Modunda** (LocalStorage) çalışır. Canlı 
 
 1. [Supabase.com](https://supabase.com) adresinden ücretsiz bir proje oluşturun.
 2. `supabase_schema.sql` dosyasındaki SQL kodlarını Supabase SQL Editor kısmına yapıştırıp çalıştırın.
-3. Proje dizininde `.env` dosyası oluşturup bilgilerinizi ekleyin:
+3. Proje dizininde `.env.local` dosyası oluşturup bilgilerinizi ekleyin:
    ```env
    VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key-here
+   VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key-here
+   VITE_ADMIN_EMAIL=admin@example.com
    ```
+   Eski `VITE_SUPABASE_ANON_KEY` ayarı da geriye dönük olarak desteklenir. Temizlik oyununun ortak skor tablosu için `supabase_cleaning_game_schema.sql` içeriğini de çalıştırın. `profiles` tablosuna bağlı kayıtlar giriş yapmış kullanıcılar arasında paylaşılır; misafir skorları tarayıcıda saklanır.
 
 ---
 

@@ -5,6 +5,8 @@ import TablesSection from './components/TablesSection';
 import StatsCharts from './components/StatsCharts';
 import PersonalProfile from './components/PersonalProfile';
 import TaskBoard from './components/TaskBoard';
+import CleaningGame from './components/CleaningGame';
+import VecizeCard from './components/VecizeCard';
 import JuzTracker from './components/JuzTracker/JuzTracker';
 import AuthModal from './components/AuthModal';
 import Footer from './components/Footer';
@@ -156,7 +158,7 @@ export default function App() {
           <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-start sm:items-center gap-3 text-xs text-amber-900 dark:text-amber-300 shadow-2xs">
             <AlertCircle className="h-5 w-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
             <div className="flex-1">
-              <span className="font-semibold text-amber-950 dark:text-amber-400">Supabase Bağlantı Uyarısı:</span> Canlı veritabanı bağlantısı için GitHub Repository ayarlarınızdan <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">Settings -&gt; Secrets -&gt; Actions</code> kısmına <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_URL</code> ve <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_ANON_KEY</code> ekleyiniz.
+              <span className="font-semibold text-amber-950 dark:text-amber-400">Supabase Bağlantı Uyarısı:</span> Canlı veritabanı bağlantısı için GitHub Repository ayarlarınızdan <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">Settings -&gt; Secrets -&gt; Actions</code> kısmına <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_URL</code> ve <code className="bg-amber-100/80 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 px-1.5 py-0.5 rounded text-amber-950 dark:text-amber-300 font-mono">VITE_SUPABASE_PUBLISHABLE_KEY</code> ekleyiniz.
             </div>
           </div>
         )}
@@ -203,6 +205,8 @@ export default function App() {
               onOpenAuth={() => setAuthModalOpen(true)}
               onUpdateUserProfile={(updatedProfile) => setUserProfile(updatedProfile)}
             />
+            <div className="mt-7"><CleaningGame userProfile={userProfile} onOpenAuth={() => setAuthModalOpen(true)} /></div>
+            <div className="mt-7"><VecizeCard /></div>
           </section>
         )}
 
