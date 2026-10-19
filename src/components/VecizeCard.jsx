@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Quote, RefreshCw, ExternalLink } from 'lucide-react';
 
 const VECIZELER = [
@@ -65,14 +65,10 @@ const VECIZELER = [
 ];
 
 export default function VecizeCard() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(
+    () => Math.floor(Math.random() * VECIZELER.length)
+  );
   const [fade, setFade] = useState(true);
-
-  // Pick a random vecize on component mount
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * VECIZELER.length);
-    setCurrentIndex(randomIndex);
-  }, []);
 
   const handleNextVecize = () => {
     setFade(false);
